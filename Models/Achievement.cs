@@ -8,5 +8,7 @@ namespace PuffPal.Models
 {
     internal class Achievement
     {
+        public int AchievementID { get; set; }
+        public DateTime DateAchieved { get; set; }
     }
 }
