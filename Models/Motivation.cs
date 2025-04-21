@@ -10,7 +10,6 @@ namespace PuffPal.Models
     {
         public string Title { get; set; }
         public string TextBody { get; set; }
-
-        public abstract void DisplayMessage();
+        public abstract string DisplayMessage();
     }
 }

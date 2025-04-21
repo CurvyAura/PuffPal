@@ -1,18 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PuffPal.Models
 {
     public class Quote : Motivation
     {
-        public int QuoteID { get; set; }
+        public int QuoteID { get; set; } // Unique identifier for the quote
 
-        public override void DisplayMessage()
+        public override string DisplayMessage()
         {
-            Console.WriteLine($"Quote: {TextBody}"); //Temp
+            return $"Quote: {TextBody}";
         }
     }
 }

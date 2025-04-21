@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PuffPal.Models
 {
-    internal class Achievement
+    public class Achievement
     {
-        public int AchievementID { get; set; }
-        public DateTime DateAchieved { get; set; }
+        public int AchievementID { get; set; } // Unique identifier for the achievement
+        public string Title { get; set; } // Title of the achievement
+        public DateTime DateAchieved { get; set; } // Date the achievement was earned
+        public string Description { get; set; } // Description of the achievement
     }
 }
