@@ -6,8 +6,8 @@
     <p class="subtitle">Break Free Today</p>
 
     <!-- Main counter -->
-    <button class="counter" @onclick="IncrementCount">
-        Tap to Count: @TodayCount
+    <button class="counter" @onclick="PuffAdd">
+        Tap to Count: @PuffsTaken
     </button>
 
     <!-- Quick stats placeholders -->
@@ -28,17 +28,13 @@
 </div>
 
 @code {
-    // Today's puff count
-    private int TodayCount = 0;
 
-    private void IncrementCount()
+	public int PuffsTaken = 0; //Placeholder until database is implemented
+
+    public void PuffAdd()
     {
-        TodayCount++;
-        // TODO: Persist count to storage
-        // TODO: Update streak logic
-        // TODO: Recalculate daily average
-        // TODO: Track time gap between presses
+        // Method to add a puff to the log
+        PuffsTaken++;
     }
-
     // TODO: Add methods/properties for StreakDays, DailyAverage, TimeGap
 }
