@@ -1,5 +1,44 @@
 ﻿@page "/"
 
-<h1>Hello, world!</h1>
+<div class="home-page">
+    <h1>VapeLess</h1>
+    <link rel="stylesheet" href="Home.Razor.css"
+    <p class="subtitle">Break Free Today</p>
 
-Welcome to your new app.
+    <!-- Main counter -->
+    <button class="counter" @onclick="IncrementCount">
+        Tap to Count: @TodayCount
+    </button>
+
+    <!-- Quick stats placeholders -->
+    <div class="stats">
+        <div class="stat">
+            <span>Daily Avg:</span>
+            <span><!-- TODO: calculate daily average --></span>
+        </div>
+        <div class="stat">
+            <span>Streak:</span>
+            <span><!-- TODO: calculate streak length --></span>
+        </div>
+        <div class="stat">
+            <span>Gap:</span>
+            <span><!-- TODO: calculate time gap between taps --></span>
+        </div>
+    </div>
+</div>
+
+@code {
+    // Today's puff count
+    private int TodayCount = 0;
+
+    private void IncrementCount()
+    {
+        TodayCount++;
+        // TODO: Persist count to storage
+        // TODO: Update streak logic
+        // TODO: Recalculate daily average
+        // TODO: Track time gap between presses
+    }
+
+    // TODO: Add methods/properties for StreakDays, DailyAverage, TimeGap
+}

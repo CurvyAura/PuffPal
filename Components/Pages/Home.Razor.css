@@ -1,0 +1,39 @@
+﻿.home-page {
+    padding: 1rem;
+    text-align: center;
+    background-color: #0d1117;
+    color: #fff;
+}
+
+.subtitle {
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.counter {
+    padding: 1rem 2rem;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    /* TODO: Add hover/focus styles */
+}
+
+.stats {
+    display: flex;
+    justify-content: space-around;
+    gap: 1rem;
+}
+
+.stat {
+    flex: 1;
+    padding: 0.5rem;
+    /* TODO: Add background, borders, layout */
+}
+
+    .stat span:first-child {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 0.25rem;
+    }

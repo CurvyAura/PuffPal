@@ -1,0 +1,55 @@
+﻿@using System.ComponentModel.DataAnnotations
+@page "/login"
+
+<EditForm Model="_loginModel" OnValidSubmit="HandleValidSubmit" class="login-form">
+    <div class="login-container">
+        <img src="images/logo.png" alt="App Logo" class="logo" />
+        <link rel="stylesheet href="Login.razor.css" />
+        <h2>Sign in</h2>
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="email">Email</label>
+            <InputText id="email" @bind-Value="_loginModel.Email" class="form-control" />
+            <ValidationMessage For="@(() => _loginModel.Email)" />
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password</label>
+            <InputText id="password" @bind-Value="_loginModel.Password" type="password" class="form-control" />
+            <ValidationMessage For="@(() => _loginModel.Password)" />
+        </div>
+
+        <div class="form-group remember-me">
+            <InputCheckbox id="rememberMe" @bind-Value="_loginModel.RememberMe" />
+            <label for="rememberMe">Remember me</label>
+        </div>
+
+        <button type="submit" class="btn">Log in</button>
+        <div class="links">
+            <a href="/forgot-password">Forgot password?</a>
+            <a href="/register">Sign up</a>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    private LoginModel _loginModel = new();
+
+    private async Task HandleValidSubmit()
+    {
+        // TODO: Implement login logic
+    }
+
+    public class LoginModel
+    {
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress(ErrorMessage = "Invalid email address")]
+        public string Email { get; set; }
+
+        [Required(ErrorMessage = "Password is required")]
+        public string Password { get; set; }
+
+        public bool RememberMe { get; set; }
+    }
+}

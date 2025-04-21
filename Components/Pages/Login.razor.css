@@ -1,0 +1,86 @@
+﻿.login-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding: 1rem;
+    background-color: #f5f5f5;
+}
+
+.login-container {
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 360px;
+}
+
+.logo {
+    display: block;
+    margin: 0 auto 1rem auto;
+    width: 80px;
+    height: auto;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+}
+
+.remember-me label {
+    margin-left: 0.5rem;
+    font-size: 0.875rem;
+    color: #555;
+}
+
+.btn {
+    width: 100%;
+    padding: 0.75rem;
+    margin-top: 1rem;
+    border: none;
+    border-radius: 4px;
+    background-color: #0078d4;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-color: #005a9e;
+}
+
+.links {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+}
+
+.links a {
+    font-size: 0.875rem;
+    color: #0078d4;
+    text-decoration: none;
+}
+
+.links a:hover {
+    text-decoration: underline;
+}
