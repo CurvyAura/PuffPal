@@ -1,8 +1,8 @@
 ﻿@page "/"
 
 <div class="home-page">
-    <h1>VapeLess</h1>
-    <link rel="stylesheet" href="Home.Razor.css"
+    <h1>PuffPal</h1>
+    <link rel="stylesheet" href="Home.Razor.css" />
     <p class="subtitle">Break Free Today</p>
 
     <!-- Main counter -->
@@ -13,28 +13,112 @@
     <!-- Quick stats placeholders -->
     <div class="stats">
         <div class="stat">
-            <span>Daily Avg:</span>
-            <span><!-- TODO: calculate daily average --></span>
+            <span>Daily Avg: @PuffsAvg</span>
         </div>
         <div class="stat">
-            <span>Streak:</span>
-            <span><!-- TODO: calculate streak length --></span>
+            <span>Streak: @StreakDays</span>
         </div>
         <div class="stat">
-            <span>Gap:</span>
-            <span><!-- TODO: calculate time gap between taps --></span>
+            <span>Time Since Last Puff: @FormattedTimeSinceLastPuff</span> <!--Unfontunately Only works while on HomePage-->
         </div>
     </div>
 </div>
 
 @code {
 
-	public int PuffsTaken = 0; //Placeholder until database is implemented
+    public int PuffsTaken = 0; // Placeholder until database is implemented
+    public double PuffsAvg = 0;
+    public int StreakDays = 0; // Placeholder until database is implemented
+    public TimeSpan TimeSinceLastPuff = TimeSpan.Zero;
+	private DateTime? LastPuffTime = null;  // Placeholder until database is implemented
+    private System.Timers.Timer PuffTimerInstance;
+
+    public string FormattedTimeSinceLastPuff =>
+        TimeSinceLastPuff.TotalSeconds > 0
+            ? $"{TimeSinceLastPuff.Hours:D2}:{TimeSinceLastPuff.Minutes:D2}:{TimeSinceLastPuff.Seconds:D2}"
+            : "00:00:00";
 
     public void PuffAdd()
     {
-        // Method to add a puff to the log
+        // Record the time of the puff
+        LastPuffTime = DateTime.Now;
         PuffsTaken++;
+		StreakDays = 0; // Reset streak days on puff
+        TimeSinceLastPuff = TimeSpan.Zero; // Reset the timer
     }
-    // TODO: Add methods/properties for StreakDays, DailyAverage, TimeGap
+
+    public void StartPuffTimer()
+    {
+        PuffTimerInstance = new System.Timers.Timer(1000); // 1-second interval
+        PuffTimerInstance.Elapsed += (sender, e) =>
+        {
+            if (LastPuffTime.HasValue)
+            {
+                TimeSinceLastPuff = DateTime.Now - LastPuffTime.Value;
+                InvokeAsync(StateHasChanged); // Update the UI
+            }
+        };
+        PuffTimerInstance.AutoReset = true;
+        PuffTimerInstance.Start();
+    }
+
+    protected override void OnInitialized()
+    {
+        // Initialize the app state
+        DailyPuffAvg();
+        StreakChecker();
+        StartPuffTimer(); // Start the timer
+    }
+
+    public void StopPuffTimer()
+    {
+        PuffTimerInstance?.Stop();
+        PuffTimerInstance?.Dispose();
+    }
+
+    public void DailyPuffAvg()
+    {
+        PuffListSetup(); // Placeholder for database implementation
+        int PuffSum = 0;
+        foreach (int puff in DailyPuffList)
+        {
+            PuffSum += puff;
+        }
+        PuffsAvg = PuffSum / DailyPuffList.Count;
+    }
+
+    public void StreakChecker()
+    {
+        PuffListSetup(); // Placeholder for database implementation
+        int Streak = 0;
+        for (int i = DailyPuffList.Count - 1; i >= 0; i--) // Count backward through the list
+        {
+            if (DailyPuffList[i] == 0)
+            {
+                Streak++;
+            }
+            else
+            {
+                break; // Stop counting if a day with non-zero puffs is encountered
+            }
+        }
+        StreakDays = Streak;
+    }
+
+    public List<int> DailyPuffList = new List<int>();
+
+    public void PuffListSetup() // Placeholder for database implementation
+    {
+        DailyPuffList.Add(23);
+        DailyPuffList.Add(12);
+        DailyPuffList.Add(5);
+        DailyPuffList.Add(26);
+        DailyPuffList.Add(0);
+    }
+
+    public void Dispose()
+    {
+        StopPuffTimer(); // Ensure the timer is stopped when the component is disposed
+    }
 }
+

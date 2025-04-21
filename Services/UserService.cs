@@ -6,29 +6,29 @@ namespace PuffPal.Services
 {
     public class UserService
     {
-        private readonly List<User> users;
+        private readonly List<UserInfo> users;
 
         public UserService()
         {
-            users = new List<User>();
+            users = new List<UserInfo>();
         }
 
-        public void AddUser(User user)
+        public void AddUser(UserInfo user)
         {
             users.Add(user);
         }
 
-        public void RemoveUser(User user)
+        public void RemoveUser(UserInfo user)
         {
             users.Remove(user);
         }
 
-        public List<User> GetAllUsers()
+        public List<UserInfo> GetAllUsers()
         {
             return users;
         }
 
-        public User GetUserById(int userId)
+        public UserInfo GetUserById(int userId)
         {
             return users.FirstOrDefault(u => u.UserId == userId); // Checks list for matching userId
         }
