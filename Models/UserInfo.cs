@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PuffPal.Models
 {
-    public class User
+    public class UserInfo
     {
         public int UserId { get; set; }
         public string Name { get; set; }
