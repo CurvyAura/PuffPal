@@ -1,0 +1,45 @@
+﻿@page "/testpage"
+@using PuffPal.Models
+
+<h1>User Test Page</h1>
+
+<h2>Current Users</h2>
+<ul>
+    @foreach (var user in userManager.GetAllUsers())
+    {
+        <li>
+            <strong>@user.Name</strong> - Quit Date: @user.QuitDate.ToShortDateString() - Days Since Quit: @user.DaysSinceQuit()
+        </li>
+    }
+</ul>
+
+<h2>Add a New User</h2>
+<input @bind="newUserName" placeholder="Name" />
+<input @bind="newUserQuitDate" type="date" />
+<input @bind="newUserPuffsPerDay" type="number" placeholder="Puffs Per Day" />
+<button @onclick="AddUser">Add User</button>
+
+@code {
+    private Services.UserService userManager = new Services.UserService();
+    private string? newUserName;
+    private DateTime newUserQuitDate = DateTime.Now;
+    private int newUserPuffsPerDay;
+
+    private void AddUser()
+    {
+        var newUser = new User
+            {
+                UserId = userManager.GetAllUsers().Count + 1,
+                Name = newUserName,
+                QuitDate = newUserQuitDate,
+                PuffsPerDay = newUserPuffsPerDay
+            };
+
+        userManager.AddUser(newUser);
+
+        // Clear input fields
+        newUserName = string.Empty;
+        newUserQuitDate = DateTime.Now;
+        newUserPuffsPerDay = 0;
+    }
+}

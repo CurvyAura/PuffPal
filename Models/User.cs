@@ -9,10 +9,10 @@ namespace PuffPal.Models
     public class User
     {
         public int UserId { get; set; }
-        public string Name { get; set; }
+        public string? Name { get; set; }
         public DateTime QuitDate { get; set; }
         public int PuffsPerDay { get; set; }
-        public ProgressTracker ProgressTracker { get; set; }
+        public ProgressTracker? ProgressTracker { get; set; }
 
         public int DaysSinceQuit ()
         {

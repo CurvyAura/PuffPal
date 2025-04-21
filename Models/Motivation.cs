@@ -8,8 +8,8 @@ namespace PuffPal.Models
 {
     public abstract class Motivation
     {
-        public string Title { get; set; }
-        public string TextBody { get; set; }
+        public string? Title { get; set; }
+        public string? TextBody { get; set; }
         public abstract string DisplayMessage();
     }
 }

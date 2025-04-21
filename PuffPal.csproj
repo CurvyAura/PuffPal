@@ -58,6 +58,9 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
+        <PackageReference Include="FirebaseAuthentication.net" Version="4.1.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="8.0.15" />
         <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="$(MauiVersion)" />
