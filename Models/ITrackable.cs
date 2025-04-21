@@ -8,6 +8,6 @@ namespace PuffPal.Models
 {
     public interface ITrackable
     {
-        void TrackProgress();
+        public void TrackProgress();
     }
 }
