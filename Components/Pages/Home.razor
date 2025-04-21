@@ -1,7 +1,7 @@
 ﻿@page "/"
 
 <div class="home-page">
-    <h1>VapeLess</h1>
+    <h1>PuffPal</h1>
     <link rel="stylesheet" href="Home.Razor.css" />
     <p class="subtitle">Break Free Today</p>
 
@@ -30,7 +30,7 @@
     public double PuffsAvg = 0;
     public int StreakDays = 0; // Placeholder until database is implemented
     public TimeSpan TimeSinceLastPuff = TimeSpan.Zero;
-    private DateTime? LastPuffTime = null;
+	private DateTime? LastPuffTime = null;  // Placeholder until database is implemented
     private System.Timers.Timer PuffTimerInstance;
 
     public string FormattedTimeSinceLastPuff =>
@@ -43,6 +43,7 @@
         // Record the time of the puff
         LastPuffTime = DateTime.Now;
         PuffsTaken++;
+		StreakDays = 0; // Reset streak days on puff
         TimeSinceLastPuff = TimeSpan.Zero; // Reset the timer
     }
 
