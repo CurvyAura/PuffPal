@@ -20,7 +20,7 @@
 <button @onclick="AddUser">Add User</button>
 
 @code {
-    private UserManager userManager = new UserManager();
+    private Services.UserService userManager = new Services.UserService();
     private string newUserName;
     private DateTime newUserQuitDate = DateTime.Now;
     private int newUserPuffsPerDay;
