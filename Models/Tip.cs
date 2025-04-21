@@ -6,7 +6,13 @@ using System.Threading.Tasks;
 
 namespace PuffPal.Models
 {
-    internal class Tip
+    public class Tip : Motivation
     {
+        public int TipID { get; set; }
+
+        public override void DisplayMessage()
+        {
+            Console.WriteLine($"Tip of the Day: {Title}\n{TextBody}");
+        }
     }
 }

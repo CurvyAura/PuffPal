@@ -1,17 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PuffPal.Models
 {
+    public enum CravingLevel
+    {
+        VeryLow = 1,
+        Low = 2,
+        Medium = 3,
+        High = 4
+    }
+
     public class DailyLog
     {
-        public DateTime Date { get; set; }
         public int LogID { get; set; }
-        public string CravingLevel { get; set; } //very low, low, medium, high saved to database as int (1-4)
+        public DateTime Date { get; set; } = DateTime.Now;
+        public CravingLevel Craving { get; set; }
+        public string Notes { get; set; }
 
+        public string GetAdvice()
+        {
+            return Craving switch
+            {
+                CravingLevel.VeryLow => "You're doing great! Keep it up.",
+                CravingLevel.Low => "Mild craving — maybe go for a walk or sip some water.",
+                CravingLevel.Medium => "Moderate craving — try a distraction like music or calling a friend.",
+                CravingLevel.High => "Strong craving — take deep breaths, ride it out. You’ve got this.",
+                _ => "Stay strong. You're making progress every day!"
+            };
+        }
         public void AddLog()
         {
             // Add logic to save the log to the database
