@@ -4,7 +4,7 @@
 @inject NavigationManager NavManager;
 
 <h3>Register</h3>
-<EditForm @Model="@registrationModel" OnValidSubmit="SignUp">
+<EditForm Model="@registrationModel" OnValidSubmit="SignUp">
     <DataAnnotationsValidator/>
     <div class="mb-2">
         <img src="@_userAvatar" class="rounded-circle" height="50" width="50" alt="Alternate Text" />

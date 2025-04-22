@@ -1,4 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Blazored.LocalStorage;
+using Firebase.Auth;
+using Firebase.Auth.Providers;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.Extensions.Logging;
+using PuffPal.CustomAuth;
 using PuffPal.Services;
 
 namespace PuffPal
@@ -26,7 +31,26 @@ namespace PuffPal
             builder.Services.AddSingleton<ProgressService>();
             builder.Services.AddSingleton<AchievementService>();
             builder.Services.AddSingleton<DailyLogService>();
-            builder.Services.AddSingleton<QuoteService>(); 
+            builder.Services.AddSingleton<QuoteService>();
+
+            //builder.Services.AddSingleton(new FirebaseAuthClient(new FirebaseAuthConfig()
+            //{
+            //    ApiKey = "AIzaSyDg-ZPsfp2jMpYTgG4rZEL2aRjYSgUufNM",
+            //    AuthDomain = "puffpal-fadb9.firebaseapp.com",
+            //    Providers = [new EmailProvider()]
+            //}));
+            builder.Services.AddScoped(sp => new FirebaseAuthClient(new FirebaseAuthConfig()
+            {
+                ApiKey = "AIzaSyDg-ZPsfp2jMpYTgG4rZEL2aRjYSgUufNM",
+                AuthDomain = "puffpal-fadb9.firebaseapp.com",
+                Providers = [new EmailProvider()]
+            }));
+
+
+            builder.Services.AddBlazoredLocalStorage();
+            builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
+            builder.Services.AddScoped(sp => (IAccountManagement)sp.GetRequiredService<AuthenticationStateProvider>());
+            builder.Services.AddAuthorizationCore();
 
             return builder.Build();
         }
