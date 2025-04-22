@@ -13,6 +13,7 @@
 		if (await Acct.CheckAuthAsync())
 		{
 			await Acct.LogoutAsync();
+			NavManager.NavigateTo("/login");
 		}
 	}
 }
