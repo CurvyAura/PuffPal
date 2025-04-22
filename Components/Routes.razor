@@ -1,6 +1,14 @@
-﻿<Router AppAssembly="@typeof(MauiProgram).Assembly">
+﻿<CascadingAuthenticationState>
+<Router AppAssembly="@typeof(MauiProgram).Assembly">
     <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(Layout.MainLayout)" />
+        <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(Layout.MainLayout)" />
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
     </Found>
+    <NotFound>
+        <PageTitle>Not Found</PageTitle>
+        <LayoutView Layout="typeof(Layout.MainLayout)">
+            <p role="alert">Sorry, address not found</p>
+        </LayoutView>
+    </NotFound>
 </Router>
+</CascadingAuthenticationState>

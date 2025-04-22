@@ -1,4 +1,6 @@
-﻿@page "/"
+﻿@page "/home"
+
+@attribute [Authorize] // Add this to any page that the user can see only after they login
 
 <div class="home-page">
     <h1>PuffPal</h1>
