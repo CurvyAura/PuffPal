@@ -71,7 +71,7 @@
         TimeSinceLastPuff = TimeSpan.Zero;
 
         // Save the puff event to the database
-        await Firebase.SavePuffAsync(userId: 1, timestamp: LastPuffTime.Value); // Replace 1 with the actual user ID
+        await Firebase.SendTestPuffAsync($"Puff tapped at {DateTime.Now}"); // Replace 1 with the actual user ID
     }
 
    public void StartPuffTimer()  
