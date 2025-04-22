@@ -3,8 +3,8 @@
 @inject IAccountManagement Acct;
 @inject NavigationManager NavManager;
 
-<div class="d-flex justify-content-center align-items-center flex-column">
-<div class="w-25">
+@* <div class="d-flex justify-content-center align-items-center flex-column"> *@
+@* <div class="w-25"> *@
 <h3>Register</h3>
 <EditForm Model="@registrationModel" OnValidSubmit="SignUp">
     <DataAnnotationsValidator/>
@@ -42,8 +42,8 @@
         </button>
     </div>
 </EditForm>
-</div>
-</div>
+@* </div> *@
+@* </div> *@
 
 @code {
     SignUp registrationModel = new();
