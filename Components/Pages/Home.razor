@@ -1,133 +1,134 @@
 ﻿@page "/home"
+@using PuffPal.Services
+@inject FirebaseService Firebase  
+@attribute [Authorize] // Add this to any page that the user can see only after they login  
 
-@attribute [Authorize] // Add this to any page that the user can see only after they login
+<div class="home-page">  
+   <h1>PuffPal</h1>  
+   <link rel="stylesheet" href="Home.Razor.css" />  
+   <p class="subtitle">Break Free Today</p>  
 
-<div class="home-page">
-    <h1>PuffPal</h1>
-    <link rel="stylesheet" href="Home.Razor.css" />
-    <p class="subtitle">Break Free Today</p>
+   <!-- Main counter -->  
+   <button class="counter" @onclick="PuffAdd">  
+       Tap to Count: @PuffsTaken  
+   </button>  
 
-    <!-- Main counter -->
-    <button class="counter" @onclick="PuffAdd">
-        Tap to Count: @PuffsTaken
-    </button>
+   <!-- Quick stats placeholders -->  
+   <div class="stats">  
+       <div class="stat">  
+           <span>Daily Avg: @PuffsAvg</span>  
+       </div>  
+       <div class="stat">  
+           <span>Streak: @StreakDays</span>  
+       </div>  
+       <div class="stat">  
+           <span>Time Since Last Puff: @FormattedTimeSinceLastPuff</span>  
+       </div>  
+   </div>  
+</div>  
+<div>  
+   <button class="btn btn-danger text-light">  
+       <NavLink class="nav-link text-light" href="/logout">  
+           <span class="text-light" aria-hidden="true"></span> Logout  
+       </NavLink>  
+   </button>  
+</div>  
 
-    <!-- Quick stats placeholders -->
-    <div class="stats">
-        <div class="stat">
-            <span>Daily Avg: @PuffsAvg</span>
-        </div>
-        <div class="stat">
-            <span>Streak: @StreakDays</span>
-        </div>
-        <div class="stat">
-            <span>Time Since Last Puff: @FormattedTimeSinceLastPuff</span>
-        </div>
-    </div>
-</div>
-<div>
-    <button class="btn btn-danger text-light">
-        <NavLink class="nav-link text-light" href="/logout">
-            <span class="text-light" aria-hidden="true"></span> Logout
-        </NavLink>
-    </button>
-</div>
+@code {  
 
-@code {
+   public int PuffsTaken = 0; // Placeholder until database is implemented  
+   public double PuffsAvg = 0;  
+   public int StreakDays = 0;  
+   public TimeSpan TimeSinceLastPuff = TimeSpan.Zero;  
+   private DateTime? LastPuffTime = null;  // Placeholder until database is implemented  
+   private System.Timers.Timer? PuffTimerInstance;  
 
-    public int PuffsTaken = 0; // Placeholder until database is implemented
-    public double PuffsAvg = 0;
-    public int StreakDays = 0;
-    public TimeSpan TimeSinceLastPuff = TimeSpan.Zero;
-	private DateTime? LastPuffTime = null;  // Placeholder until database is implemented
-    private System.Timers.Timer PuffTimerInstance;
+   public string FormattedTimeSinceLastPuff =>  
+       TimeSinceLastPuff.TotalSeconds > 0  
+           ? $"{TimeSinceLastPuff.Hours:D2}:{TimeSinceLastPuff.Minutes:D2}:{TimeSinceLastPuff.Seconds:D2}"  
+           : "00:00:00";  
 
-    public string FormattedTimeSinceLastPuff =>
-        TimeSinceLastPuff.TotalSeconds > 0
-            ? $"{TimeSinceLastPuff.Hours:D2}:{TimeSinceLastPuff.Minutes:D2}:{TimeSinceLastPuff.Seconds:D2}"
-            : "00:00:00";
+   public async void PuffAdd()  
+   {  
+       // Record the time of the puff  
+       LastPuffTime = DateTime.Now;  
+       PuffsTaken++;  
+       StreakDays = 0; // Reset streak days on puff  
+       TimeSinceLastPuff = TimeSpan.Zero; // Reset the timer  
+       await Firebase.SendTestPuffAsync($"Puff tapped at {DateTime.Now}"); //Zeus send this to the database, and my life is yours
+   }  
 
-    public void PuffAdd()
-    {
-        // Record the time of the puff
-        LastPuffTime = DateTime.Now;
-        PuffsTaken++;
-		StreakDays = 0; // Reset streak days on puff
-        TimeSinceLastPuff = TimeSpan.Zero; // Reset the timer
-    }
+   public void StartPuffTimer()  
+   {  
+       PuffTimerInstance = new System.Timers.Timer(1000); // 1-second interval  
+       PuffTimerInstance.Elapsed += (sender, e) =>  
+       {  
+           if (LastPuffTime.HasValue)  
+           {  
+               TimeSinceLastPuff = DateTime.Now - LastPuffTime.Value;  
+               InvokeAsync(StateHasChanged); // Update the UI  
+           }  
+       };  
+       PuffTimerInstance.AutoReset = true;  
+       PuffTimerInstance.Start();  
+   }  
 
-    public void StartPuffTimer()
-    {
-        PuffTimerInstance = new System.Timers.Timer(1000); // 1-second interval
-        PuffTimerInstance.Elapsed += (sender, e) =>
-        {
-            if (LastPuffTime.HasValue)
-            {
-                TimeSinceLastPuff = DateTime.Now - LastPuffTime.Value;
-                InvokeAsync(StateHasChanged); // Update the UI
-            }
-        };
-        PuffTimerInstance.AutoReset = true;
-        PuffTimerInstance.Start();
-    }
+   protected override void OnInitialized()  
+   {  
+       // Initialize the app state  
+       DailyPuffAvg();  
+       StreakChecker();  
+       StartPuffTimer(); // Start the timer  
+   }  
 
-    protected override void OnInitialized()
-    {
-        // Initialize the app state
-        DailyPuffAvg();
-        StreakChecker();
-        StartPuffTimer(); // Start the timer
-    }
+   public void StopPuffTimer()  
+   {  
+       PuffTimerInstance?.Stop();  
+       PuffTimerInstance?.Dispose();  
+   }  
 
-    public void StopPuffTimer()
-    {
-        PuffTimerInstance?.Stop();
-        PuffTimerInstance?.Dispose();
-    }
+   public void DailyPuffAvg()  
+   {  
+       PuffListSetup(); // Placeholder for database implementation  
+       int PuffSum = 0;  
+       foreach (int puff in DailyPuffList)  
+       {  
+           PuffSum += puff;  
+       }  
+       PuffsAvg = PuffSum / DailyPuffList.Count;  
+   }  
 
-    public void DailyPuffAvg()
-    {
-        PuffListSetup(); // Placeholder for database implementation
-        int PuffSum = 0;
-        foreach (int puff in DailyPuffList)
-        {
-            PuffSum += puff;
-        }
-        PuffsAvg = PuffSum / DailyPuffList.Count;
-    }
+   public void StreakChecker()  
+   {  
+       PuffListSetup(); // Placeholder for database implementation  
+       int Streak = 0;  
+       for (int i = DailyPuffList.Count - 1; i >= 0; i--) // Count backward through the list  
+       {  
+           if (DailyPuffList[i] == 0)  
+           {  
+               Streak++;  
+           }  
+           else  
+           {  
+               break; // Stop counting if a day with non-zero puffs is encountered  
+           }  
+       }  
+       StreakDays = Streak;  
+   }  
 
-    public void StreakChecker()
-    {
-        PuffListSetup(); // Placeholder for database implementation
-        int Streak = 0;
-        for (int i = DailyPuffList.Count - 1; i >= 0; i--) // Count backward through the list
-        {
-            if (DailyPuffList[i] == 0)
-            {
-                Streak++;
-            }
-            else
-            {
-                break; // Stop counting if a day with non-zero puffs is encountered
-            }
-        }
-        StreakDays = Streak;
-    }
+   public List<int> DailyPuffList = new List<int>();  
 
-    public List<int> DailyPuffList = new List<int>();
+   public void PuffListSetup() // Placeholder for database implementation  
+   {  
+       DailyPuffList.Add(23);  
+       DailyPuffList.Add(12);  
+       DailyPuffList.Add(5);  
+       DailyPuffList.Add(26);  
+       DailyPuffList.Add(0);  
+   }  
 
-    public void PuffListSetup() // Placeholder for database implementation
-    {
-        DailyPuffList.Add(23);
-        DailyPuffList.Add(12);
-        DailyPuffList.Add(5);
-        DailyPuffList.Add(26);
-        DailyPuffList.Add(0);
-    }
-
-    public void Dispose()
-    {
-        StopPuffTimer(); // Ensure the timer is stopped when the component is disposed
-    }
+   public void Dispose()  
+   {  
+       StopPuffTimer(); // Ensure the timer is stopped when the component is disposed  
+   }  
 }
-

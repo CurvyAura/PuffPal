@@ -32,6 +32,7 @@ namespace PuffPal
             builder.Services.AddSingleton<AchievementService>();
             builder.Services.AddSingleton<DailyLogService>();
             builder.Services.AddSingleton<QuoteService>();
+            builder.Services.AddSingleton<FirebaseService>();
 
             //builder.Services.AddSingleton(new FirebaseAuthClient(new FirebaseAuthConfig()
             //{
