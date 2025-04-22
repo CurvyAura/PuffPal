@@ -6,12 +6,12 @@
 <div class="home-page">  
    <h1>PuffPal</h1>  
    <link rel="stylesheet" href="Home.Razor.css" />  
-   <p class="subtitle">Break Free Today</p>  
+   <p class="subtitle">Break Free Today</p>
 
-   <!-- Main counter -->  
-   <button class="counter" @onclick="PuffAdd">  
-       Tap to Count: @PuffsTaken  
-   </button>  
+    <!-- Main counter -->
+    <button class="btn btn-danger btn-lg text-light" @onclick="PuffAdd">
+        Tap to Add a Puff: @PuffsTaken
+    </button>
 
    <!-- Quick stats placeholders -->  
    <div class="stats">  
@@ -48,15 +48,31 @@
            ? $"{TimeSinceLastPuff.Hours:D2}:{TimeSinceLastPuff.Minutes:D2}:{TimeSinceLastPuff.Seconds:D2}"  
            : "00:00:00";  
 
-   public async void PuffAdd()  
-   {  
-       // Record the time of the puff  
-       LastPuffTime = DateTime.Now;  
-       PuffsTaken++;  
-       StreakDays = 0; // Reset streak days on puff  
-       TimeSinceLastPuff = TimeSpan.Zero; // Reset the timer  
-       await Firebase.SendTestPuffAsync($"Puff tapped at {DateTime.Now}"); //Zeus send this to the database, and my life is yours
-   }  
+   // public async void PuffAdd()  
+   // {  
+   //     Record the time of the puff  
+   //     LastPuffTime = DateTime.Now;  
+   //     PuffsTaken++;  
+   //     StreakDays = 0; Reset streak days on puff  
+   //     TimeSinceLastPuff = TimeSpan.Zero; Reset the timer  
+   //     await Firebase.SendTestPuffAsync($"Puff tapped at {DateTime.Now}"); Zeus send this to the database, and my life is yours 
+
+   // copied func below, we will need to specify the user that took the puff.
+   // }  
+
+    public async void PuffAdd()
+    {
+        // Record the time of the puff
+        LastPuffTime = DateTime.Now;
+        PuffsTaken++;
+
+        // Reset streak days and timer
+        StreakDays = 0;
+        TimeSinceLastPuff = TimeSpan.Zero;
+
+        // Save the puff event to the database
+        await Firebase.SavePuffAsync(userId: 1, timestamp: LastPuffTime.Value); // Replace 1 with the actual user ID
+    }
 
    public void StartPuffTimer()  
    {  
@@ -73,13 +89,13 @@
        PuffTimerInstance.Start();  
    }  
 
-   protected override void OnInitialized()  
-   {  
-       // Initialize the app state  
-       DailyPuffAvg();  
-       StreakChecker();  
-       StartPuffTimer(); // Start the timer  
-   }  
+   protected override async Task OnInitializedAsync()
+   {
+       // Initialize the app state
+       await DailyPuffAvg();
+       await StreakChecker();        
+       StartPuffTimer(); // Start the timer
+   }
 
    public void StopPuffTimer()  
    {  
@@ -87,45 +103,80 @@
        PuffTimerInstance?.Dispose();  
    }  
 
-   public void DailyPuffAvg()  
-   {  
-       PuffListSetup(); // Placeholder for database implementation  
-       int PuffSum = 0;  
-       foreach (int puff in DailyPuffList)  
-       {  
-           PuffSum += puff;  
-       }  
-       PuffsAvg = PuffSum / DailyPuffList.Count;  
-   }  
+   // public void DailyPuffAvg()  
+   // {  
+   //     PuffListSetup(); Placeholder for database implementation  
+   //     int PuffSum = 0;  
+   //     foreach (int puff in DailyPuffList)  
+   //     {  
+   //         PuffSum += puff;  
+   //     }  
+   //     PuffsAvg = PuffSum / DailyPuffList.Count;  
+   // }  
+    public async Task DailyPuffAvg()
+    {
+        // Fetch daily puff data from the database
+        DailyPuffList = await Firebase.GetDailyPuffDataAsync(userId: 1); // Replace 1 with the actual user ID
 
-   public void StreakChecker()  
-   {  
-       PuffListSetup(); // Placeholder for database implementation  
-       int Streak = 0;  
-       for (int i = DailyPuffList.Count - 1; i >= 0; i--) // Count backward through the list  
-       {  
-           if (DailyPuffList[i] == 0)  
-           {  
-               Streak++;  
-           }  
-           else  
-           {  
-               break; // Stop counting if a day with non-zero puffs is encountered  
-           }  
-       }  
-       StreakDays = Streak;  
-   }  
+        // Calculate the average
+        if (DailyPuffList.Count > 0)
+        {
+            PuffsAvg = DailyPuffList.Average();
+        }
+        else
+        {
+            PuffsAvg = 0;
+        }
+    }
+
+   // public void StreakChecker()  
+   // {  
+   //     PuffListSetup(); Placeholder for database implementation  
+   //     int Streak = 0;  
+   //     for (int i = DailyPuffList.Count - 1; i >= 0; i--) Count backward through the list  
+   //     {  
+   //         if (DailyPuffList[i] == 0)  
+   //         {  
+   //             Streak++;  
+   //         }  
+   //         else  
+   //         {  
+   //             break; Stop counting if a day with non-zero puffs is encountered  
+   //         }  
+   //     }  
+   //     StreakDays = Streak;  
+   // }  
+    public async Task StreakChecker()
+    {
+        // Fetch daily puff data from the database
+        DailyPuffList = await Firebase.GetDailyPuffDataAsync(userId: 1); // Replace 1 with the actual user ID
+
+        // Calculate the streak
+        int streak = 0;
+        for (int i = DailyPuffList.Count - 1; i >= 0; i--) // Count backward through the list
+        {
+            if (DailyPuffList[i] == 0)
+            {
+                streak++;
+            }
+            else
+            {
+                break; // Stop counting if a day with non-zero puffs is encountered
+            }
+        }
+        StreakDays = streak;
+    }
 
    public List<int> DailyPuffList = new List<int>();  
 
-   public void PuffListSetup() // Placeholder for database implementation  
-   {  
-       DailyPuffList.Add(23);  
-       DailyPuffList.Add(12);  
-       DailyPuffList.Add(5);  
-       DailyPuffList.Add(26);  
-       DailyPuffList.Add(0);  
-   }  
+   // public void PuffListSetup() Placeholder for database implementation  
+   // {  
+   //     DailyPuffList.Add(23);  
+   //     DailyPuffList.Add(12);  
+   //     DailyPuffList.Add(5);  
+   //     DailyPuffList.Add(26);  
+   //     DailyPuffList.Add(0);  
+   // }  
 
    public void Dispose()  
    {  
