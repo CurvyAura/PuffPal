@@ -1,0 +1,18 @@
+﻿@page "/logout"
+
+@inject IAccountManagement Acct;
+@inject NavigationManager NavManager;
+
+<h3>Logout</h3>
+
+@code {
+	private AuthorizeView? authView;
+
+	protected async override Task OnInitializedAsync()
+	{
+		if (await Acct.CheckAuthAsync())
+		{
+			await Acct.LogoutAsync();
+		}
+	}
+}

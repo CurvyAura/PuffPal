@@ -1,0 +1,63 @@
+﻿@page "/login"
+
+@inject IAccountManagement Acct;
+@inject NavigationManager NavManager;
+
+@if (errorList.Length > 0)
+{
+    foreach (var error in errorList)
+    {
+        <div class="alert alert-danger">@error</div>
+    }
+}
+
+<h3>Login</h3>
+<EditForm @Model="@_SignInModel" OnValidSubmit="DoLoginAsync">
+    <DataAnnotationsValidator/>
+
+    <div class="form-group">
+        <label>Email address</label>
+        <input type="email" class="form-control" @bind-value="@_SignInModel.Email" placeholder="" />
+        <ValidationMessage For="@(() => _SignInModel.Email)" />
+    </div>
+
+    <div class="form-group">
+        <label>Password</label>
+        <input type="password" class="form-control" @bind-value="@_SignInModel.Password" placeholder="" />
+        <ValidationMessage For="@(() => _SignInModel.Password)" />
+    </div>
+
+    <div class="mt-2 text-end">
+        <NavLink class="nav-link" href="/register">
+            <span>Create an account?</span>
+        </NavLink>
+    </div>
+
+    <div class="text-center mt-2">
+        <button class="btn btn-primary" type="submit">
+            <span class="@_spinnerClass" role="status" aria-hidden="true"></span>
+            Login
+        </button>
+    </div>
+</EditForm>
+
+@code {
+    private string _spinnerClass = "";
+    private SignIn _SignInModel = new();
+    private string[] errorList = [];
+
+    public async Task DoLoginAsync()
+    {
+        _spinnerClass = "spinner-border spinner-border-sm";
+        var result = await Acct.LoginAsync(_SignInModel.Email, _SignInModel.Password);
+        if (result.Succeeded)
+        {
+            NavManager.NavigateTo("/");
+        }
+        else
+        {
+            _spinnerClass = "";
+            errorList = result.ErrorList;
+        }
+    }
+}
