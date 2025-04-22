@@ -8,8 +8,13 @@
     <p class="subtitle">Break Free Today</p>
 
     <!-- Main counter -->
-    <button class="counter" @onclick="PuffAdd">
-        Tap to Count: @PuffsTaken
+    @* <button class="counter" @onclick="PuffAdd"> *@
+    @*     Tap to Count: @PuffsTaken *@
+    @* </button> *@
+
+    <!-- Main counter -->
+    <button class="btn btn-danger btn-lg text-light" @onclick="PuffAdd">
+        Tap when you puff: @PuffsTaken
     </button>
 
     <!-- Quick stats placeholders -->
