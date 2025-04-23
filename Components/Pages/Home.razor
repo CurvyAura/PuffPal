@@ -150,6 +150,7 @@
         await Firebase.SavePuffAsync(userId, LastPuffTime.Value);
 
         PuffsTaken = await Firebase.GetDailyPuffCountAsync(userId);
+        StateHasChanged();
 
         StreakDays = 0;
         TimeSinceLastPuff = TimeSpan.Zero;

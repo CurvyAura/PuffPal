@@ -72,24 +72,6 @@ namespace PuffPal.Services
                 .PutAsync(currentCount + 1);
         }
 
-        public async Task<int> GetDailyPuffCountAsync(string userId)
-        {
-            //string today = DateTime.UtcNow.ToString("yyyy-MM-dd");
-            string today = DateTime.Now.ToString("yyyy-MM-dd");
-
-
-            // Retrieve the puff count for today
-            var puffData = await _client
-                .Child("users")
-                .Child(userId)
-                .Child("dailyPuffs")
-                .Child(userId)
-                .Child(today)
-                .OnceSingleAsync<int?>();
-
-            return puffData ?? 0;
-        }
-
 
         // Retrieve daily puff data for a user  
 
@@ -98,32 +80,39 @@ namespace PuffPal.Services
         //•	Fetch all puff data for the user from the dailyPuffs/{ userId} path.
         //•	Convert the data into a list of daily puff counts.
 
-        public async Task<List<int>> GetDailyPuffDataAsync(string userId)
+        public async Task<int> GetDailyPuffCountAsync(string userId)
         {
+            string today = DateTime.Now.ToString("yyyy-MM-dd");
+
             var puffData = await _client
                 .Child("users")
                 .Child(userId)
                 .Child("dailyPuffs")
-                .Child(userId.ToString())
-                .OnceAsync<KeyValuePair<string, int>>();
+                .Child(today)
+                .OnceSingleAsync<int?>();
 
-            // Convert the data into a list of daily puff counts  
-            var dailyPuffCounts = puffData
-                .Select(static p => p.Object.Value)
-                .ToList();
-
-            return dailyPuffCounts;
+            return puffData ?? 0;
         }
+        public async Task<List<int>> GetDailyPuffDataAsync(string userId)
+        {
+            var puffDict = await _client
+                .Child("users")
+                .Child(userId)
+                .Child("dailyPuffs")
+                .OnceSingleAsync<Dictionary<string, int>>();
 
+            if (puffDict == null || puffDict.Count == 0)
+                return new List<int>();
+
+            return puffDict.Values.ToList();
+        }
 
         public async Task<DateTime?> GetLastPuffTimeAsync(string userId)
         {
-            // Retrieve the last puff time for the user
             var lastPuffTime = await _client
                 .Child("users")
                 .Child(userId)
                 .Child("lastPuffTime")
-                .Child(userId)
                 .OnceSingleAsync<DateTime?>();
 
             return lastPuffTime;
@@ -131,12 +120,10 @@ namespace PuffPal.Services
 
         public async Task SaveLastPuffTimeAsync(string userId, DateTime timestamp)
         {
-            // Save the current timestamp as the last puff time for the user
             await _client
                 .Child("users")
                 .Child(userId)
                 .Child("lastPuffTime")
-                .Child(userId)
                 .PutAsync(timestamp);
         }
 
@@ -160,7 +147,6 @@ namespace PuffPal.Services
                     .Child("users")
                     .Child(userId)
                     .Child("dailyPuffs")
-                    .Child(userId)
                     .Child(dateKey)
                     .OnceSingleAsync<int?>();
 
