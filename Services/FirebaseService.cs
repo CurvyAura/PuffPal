@@ -142,5 +142,34 @@ namespace PuffPal.Services
                 .PutAsync(serializedTimestamp);
         }
 
+        public async Task<Dictionary<string, int>> GetWeeklyPuffDataAsync(string userId)
+        {
+            // Get the current date
+            DateTime today = DateTime.Now;
+
+            // Create a dictionary to store puff data for the past 7 days
+            Dictionary<string, int> weeklyPuffData = new Dictionary<string, int>();
+
+            // Loop through the past 7 days
+            for (int i = 0; i < 7; i++)
+            {
+                // Calculate the date for each day
+                DateTime date = today.AddDays(-i);
+                string dateKey = date.ToString("yyyy-MM-dd");
+
+                // Retrieve the puff count for the specific day
+                var puffData = await _client
+                    .Child("dailyPuffs")
+                    .Child(userId)
+                    .Child(dateKey)
+                    .OnceSingleAsync<int?>();
+
+                // Add the puff count to the dictionary (default to 0 if no data exists)
+                weeklyPuffData[dateKey] = puffData ?? 0;
+            }
+
+            return weeklyPuffData;
+        }
+
     }
 }

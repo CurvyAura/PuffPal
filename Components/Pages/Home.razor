@@ -19,7 +19,7 @@
    <!-- Quick stats placeholders -->  
    <div class="stats">  
        <div class="stat">  
-           <span>Daily Avg: @PuffsAvg</span>  
+           <span>Weekly Avg: @PuffsAvg</span>  
        </div>  
        <div class="stat">  
            <span>Streak: @StreakDays</span>  
@@ -192,6 +192,14 @@
         PuffsTaken = await Firebase.GetDailyPuffCountAsync(userId);
 
 
+		//get the weekly puff data
+        var weeklyPuffData = await Firebase.GetWeeklyPuffDataAsync(userId);
+
+        foreach (var entry in weeklyPuffData)
+        {
+            Debug.WriteLine($"Date: {entry.Key}, Puff Count: {entry.Value}");
+        }
+
         // Get the last puff time
         LastPuffTime = await Firebase.GetLastPuffTimeAsync(userId);
 
@@ -227,15 +235,12 @@
     //     }  
     //     PuffsAvg = PuffSum / DailyPuffList.Count;  
     // }  
-    public async Task DailyPuffAvg()
-    {
-        // Fetch daily puff data from the database
-        DailyPuffList = await Firebase.GetDailyPuffDataAsync(userId: 1); // Replace 1 with the actual user ID
-
-        // Calculate the average
-        if (DailyPuffList.Count > 0)
+    public async Task WeeklyPuffAvg()  
+       {
+           // Calculate the average  
+        if (weeklyPuffData != null && weeklyPuffData.Count > 0)
         {
-            PuffsAvg = DailyPuffList.Average();
+            PuffsAvg = weeklyPuffData.Values.Average();
         }
         else
         {
