@@ -87,16 +87,16 @@
 
 @code {
 
-    public int PuffsTaken = 0; // Placeholder until database is implemented  
-    public double PuffsAvg = 0;  
-    public int StreakDays = 0;  
-    public TimeSpan TimeSinceLastPuff = TimeSpan.Zero;  
-    public DateTime? LastPuffTime = null;  // Placeholder until database is implemented  
+    public int PuffsTaken = 0; // Placeholder until database is called  
+    public double PuffsAvg = 0;  // Placeholder until database is called
+    public int StreakDays = 0;  // Placeholder until database is called
+    public TimeSpan TimeSinceLastPuff = TimeSpan.Zero;  // Placeholder until database is called
+    public DateTime? LastPuffTime = null; // Placeholder until database is called
     private System.Timers.Timer? PuffTimerInstance;  
     private bool showQuitDatePopup = false; // Controls the visibility of the popup
     private DateTime selectedQuitDate = DateTime.Today; // Stores the selected quit date
-	public List<int> DailyPuffList = new List<int>(); // Placeholder for daily puff data
-	public int DailyGoal = 0; // Placeholder for daily goal
+	public List<int> DailyPuffList = new List<int>(); // Initailizing holder for daily puff data
+    public int DailyGoal = 0; // Placeholder until database is called
 
     // Show the popup
     private void ShowQuitDatePopup()
@@ -167,7 +167,6 @@
             return;
         }
 
-        // Example: Assume averageDailyPuffs is already calculated
         double averageDailyPuffs = PuffsAvg; // Use the calculated weekly average
         Dictionary<string, int> dailyPuffGoals = new Dictionary<string, int>();
 
@@ -293,9 +292,6 @@
         StartPuffTimer();
     }
 
-
-
-
     public void StopPuffTimer()  
     {  
         PuffTimerInstance?.Stop();  
@@ -354,15 +350,11 @@
 
         Debug.WriteLine($"Weekly Average Puffs: {PuffsAvg}");
 
-        StateHasChanged(); // Update the UI
-    }
-
-    public Home()
-    {
+        StateHasChanged();
     }
 
     public void Dispose()  
     {  
-       StopPuffTimer(); // Ensure the timer is stopped when the component is disposed  
+       StopPuffTimer(); // Ensure the timer is stopped
    }  
 }

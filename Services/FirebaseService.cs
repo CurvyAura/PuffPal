@@ -27,14 +27,8 @@ namespace PuffPal.Services
                 .PostAsync(new { message = message, timestamp = DateTime.UtcNow });
         }
 
-        public async Task SaveUserProfileAsync(string userid, DateTime quitDay) //E
+        public async Task SaveUserProfileAsync(string userid, DateTime quitDay) 
         {
-            //string userId = await GetCurrentUserIdAsync(); //Retrives userid from login
-
-            //if (string.IsNullOrEmpty(userId))
-            //{
-            //    throw new InvalidOperationException("User is not logged in.");
-            //}
             string jsonquitdate = JsonSerializer.Serialize(quitDay.ToString("o"));
             await _client
                 .Child("users")
@@ -43,15 +37,7 @@ namespace PuffPal.Services
                 .PutAsync(jsonquitdate);
         }
 
-        // Save a puff event for the current day
-
-        //•	Purpose: Increment the puff count for the current day.
-        //•	Logic:
-        //•	Use the current date(yyyy-MM-dd) as the key for the puff count.
-        //•	Retrieve the current puff count for the day.
-        //•	Increment the count and save it back to the database.
-
-        public async Task SavePuffAsync(string userId, DateTime timestamp) //E
+        public async Task SavePuffAsync(string userId, DateTime timestamp) 
         {
             string today = timestamp.ToString("yyyy-MM-dd");
 
@@ -74,14 +60,6 @@ namespace PuffPal.Services
                 .PutAsync(currentCount + 1);
         }
 
-
-        // Retrieve daily puff data for a user  
-
-        //•	Purpose: Retrieve all daily puff counts for a user.
-        //•	Logic:
-        //•	Fetch all puff data for the user from the dailyPuffs/{ userId} path.
-        //•	Convert the data into a list of daily puff counts.
-
         public async Task<int> GetDailyPuffCountAsync(string userId)
         {
             string today = DateTime.Now.ToString("yyyy-MM-dd");
@@ -95,6 +73,7 @@ namespace PuffPal.Services
 
             return puffData ?? 0;
         }
+
         public async Task<List<int>> GetDailyPuffDataAsync(string userId)
         {
             var puffDict = await _client
