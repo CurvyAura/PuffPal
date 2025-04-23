@@ -3,6 +3,7 @@
 @using System.Text.Json
 @using System.Diagnostics
 @inject FirebaseService Firebase  
+@inject CustomAuthStateProvider AuthStateProvider
 @attribute [Authorize] // Add this to any page that the user can see only after they login  
 
 <div class="home-page">  
@@ -80,9 +81,14 @@
 
     public async void PuffAdd()
     {
-        await Task.Yield(); // Ensure the method runs asynchronously
+        // Retrieve the UID of the logged-in user
+        string? userId = AuthStateProvider.GetCurrentUserUid();
 
-        string userId = "000001";
+        if (string.IsNullOrEmpty(userId))
+        {
+            Debug.WriteLine("User is not authenticated.");
+            return;
+        }
 
         LastPuffTime = DateTime.Now;
 
@@ -115,7 +121,17 @@
 
     protected override async Task OnInitializedAsync()
     {
-        string userId = "000001"; // Replace with the logged-in user's ID
+        //string userId = "000001"; // Replace with the logged-in user's ID
+        // Retrieve the UID of the logged-in user
+        string? userId = AuthStateProvider.GetCurrentUserUid();
+
+        if (string.IsNullOrEmpty(userId))
+        {
+            Debug.WriteLine("User is not authenticated.");
+            return;
+        }
+
+        Debug.WriteLine($"Logged-in User UID: {userId}");
 
         // Get the puff count for today
         PuffsTaken = await Firebase.GetDailyPuffCountAsync(userId);

@@ -17,6 +17,7 @@ namespace PuffPal.Services
         {
             _client = new Firebase.Database.FirebaseClient("https://puffpal-fadb9-default-rtdb.firebaseio.com/");
         }
+
         public async Task SendTestPuffAsync(string message)
         {
             await _client

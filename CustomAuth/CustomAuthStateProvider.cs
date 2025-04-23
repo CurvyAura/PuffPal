@@ -29,6 +29,13 @@ namespace PuffPal.CustomAuth
             return _authenticated;
         }
 
+        // This method retrieves the current user's UID from the Firebase authentication client.
+        public string? GetCurrentUserUid()
+        {
+            return _firebaseAuthClient.User?.Uid; // Return the UID of the logged-in user, or null if not authenticated
+        }
+
+
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
             _authenticated = false;

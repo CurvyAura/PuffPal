@@ -34,12 +34,6 @@ namespace PuffPal
             builder.Services.AddSingleton<QuoteService>();
             builder.Services.AddSingleton<FirebaseService>();
 
-            //builder.Services.AddSingleton(new FirebaseAuthClient(new FirebaseAuthConfig()
-            //{
-            //    ApiKey = "AIzaSyDg-ZPsfp2jMpYTgG4rZEL2aRjYSgUufNM",
-            //    AuthDomain = "puffpal-fadb9.firebaseapp.com",
-            //    Providers = [new EmailProvider()]
-            //}));
             builder.Services.AddScoped(sp => new FirebaseAuthClient(new FirebaseAuthConfig()
             {
                 ApiKey = "AIzaSyDg-ZPsfp2jMpYTgG4rZEL2aRjYSgUufNM",
@@ -47,8 +41,10 @@ namespace PuffPal
                 Providers = [new EmailProvider()]
             }));
 
-
             builder.Services.AddBlazoredLocalStorage();
+
+            // Register CustomAuthStateProvider
+            builder.Services.AddScoped<CustomAuthStateProvider>();
             builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
             builder.Services.AddScoped(sp => (IAccountManagement)sp.GetRequiredService<AuthenticationStateProvider>());
             builder.Services.AddAuthorizationCore();
