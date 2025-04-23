@@ -4,56 +4,79 @@
 @using System.Diagnostics
 @inject FirebaseService Firebase  
 @inject CustomAuthStateProvider AuthStateProvider
-@attribute [Authorize] // Add this to any page that the user can see only after they login  
+@attribute [Authorize]
 
-<div class="home-page">  
-   <h1>PuffPal</h1>  
-   <link rel="stylesheet" href="Home.Razor.css" />  
-   <p class="subtitle">Break Free Today</p>
+<div class="min-vh-100 bg-black text-light py-4 px-3">
 
-    <!-- Main counter -->
-    <button class="btn btn-danger btn-lg text-light" @onclick="PuffAdd">
-        Tap to Add a Puff: @PuffsTaken
-    </button>
+    <div class="text-center mb-4">
+        <h1 class="display-4 fw-bold text-light">PuffPal</h1>
+        <p class="lead text-muted">Break Free Today</p>
+    </div>
 
-   <!-- Quick stats placeholders -->  
-   <div class="stats">  
-       <div class="stat">
-            <span>Weekly Avg: @PuffsAvg</span>
-        </div>  
-       <div class="stat">  
-           <span>Streak: @StreakDays</span>  
-       </div>  
-       <div class="stat">  
-           <span>Time Since Last Puff: @FormattedTimeSinceLastPuff</span>  
-       </div>  
-   </div>  
-</div>  
-<div>  
-   <button class="btn btn-danger text-light">  
-       <NavLink class="nav-link text-light" href="/logout">  
-           <span class="text-light" aria-hidden="true"></span> Logout  
-       </NavLink>  
-   </button>  
-</div>  
-<div>
-    <!-- Button to trigger the popup -->
-    <button class="btn btn-success" @onclick="ShowQuitDatePopup">Set Quit Date</button>
+    <!-- Big Puff Button -->
+    <div class="text-center mb-4">
+        <button class="btn btn-danger btn-lg w-100 py-4 fs-3 fw-bold shadow" @onclick="PuffAdd">
+            🚬 Tap to Add a Puff: <span class="fw-bolder">@PuffsTaken</span>
+        </button>
+    </div>
+
+    <!-- Stat Cards Row -->
+    <div class="row g-3 justify-content-center mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card bg-dark border-secondary text-center">
+                <div class="card-body p-3">
+                    <h6 class="text-secondary">Weekly Avg</h6>
+                    <div class="display-6 text-light">@PuffsAvg</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card bg-dark border-secondary text-center">
+                <div class="card-body p-3">
+                    <h6 class="text-secondary">Streak</h6>
+                    <div class="display-6 text-light">@StreakDays</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="card bg-dark border-secondary text-center">
+                <div class="card-body p-3">
+                    <h6 class="text-secondary">Time Since Last Puff</h6>
+                    <div class="h4 text-light">@FormattedTimeSinceLastPuff</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quit Date and Logout Buttons -->
+    <div class="d-grid gap-3 mb-5">
+        <button class="btn btn-outline-light" @onclick="ShowQuitDatePopup">📅 Set Quit Date</button>
+        <NavLink href="/logout" class="btn btn-outline-danger">Logout</NavLink>
+    </div>
 </div>
 
 @if (showQuitDatePopup)
 {
-    <div class="modal-overlay">
-        <div class="modal-content">
-            <h3>Select Your Quit Date</h3>
-            <input type="date" @bind="selectedQuitDate" class="form-control" />
-            <div class="mt-2">
-                <button class="btn btn-success" @onclick="SaveQuitDate">Save</button>
-                <button class="btn btn-danger" @onclick="CloseQuitDatePopup">Cancel</button>
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.75);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-light border border-secondary rounded shadow-lg">
+                <div class="modal-header border-bottom border-secondary">
+                    <h5 class="modal-title">📅 Set Your Quit Date</h5>
+                    <button type="button" class="btn-close btn-close-white" aria-label="Close" @onclick="CloseQuitDatePopup"></button>
+                </div>
+                <div class="modal-body">
+                    <label for="quitDate" class="form-label text-secondary">Choose a date you plan to quit</label>
+                    <input type="date" id="quitDate" @bind="selectedQuitDate" class="form-control bg-dark text-light border-secondary" />
+                </div>
+                <div class="modal-footer border-top border-secondary">
+                    <button class="btn btn-outline-secondary" @onclick="CloseQuitDatePopup">Cancel</button>
+                    <button class="btn btn-success" @onclick="SaveQuitDate">Save</button>
+                </div>
             </div>
         </div>
     </div>
 }
+
 @code {
 
     public int PuffsTaken = 0; // Placeholder until database is implemented  
