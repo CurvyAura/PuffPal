@@ -118,11 +118,69 @@
 
         Debug.WriteLine($"Quit date saved: {selectedQuitDate}");
 
+        // Recalculate and save daily puff goals
+        await SaveCalculatedPuffGoalsAsync();
+
         // Close the popup
         showQuitDatePopup = false;
 
         StateHasChanged();
     }
+
+	// Calculate and save daily puff goals
+    private async Task SaveCalculatedPuffGoalsAsync()
+    {
+        // Retrieve the UID of the logged-in user
+        string? userId = AuthStateProvider.GetCurrentUserUid();
+
+        if (string.IsNullOrEmpty(userId))
+        {
+            Debug.WriteLine("User is not authenticated.");
+            return;
+        }
+
+        // Retrieve the quit date
+        DateTime? quitDate = await Firebase.GetQuitDateAsync(userId);
+
+        if (!quitDate.HasValue)
+        {
+            Debug.WriteLine("Quit date not set.");
+            return;
+        }
+
+        // Calculate the number of days remaining until the quit date
+        DateTime today = DateTime.UtcNow.Date;
+        int daysUntilQuit = (quitDate.Value.Date - today).Days;
+
+        if (daysUntilQuit <= 0)
+        {
+            Debug.WriteLine("Quit date is today or in the past.");
+            return;
+        }
+
+        // Example: Assume averageDailyPuffs is already calculated
+        double averageDailyPuffs = PuffsAvg; // Use the calculated weekly average
+        Dictionary<string, int> dailyPuffGoals = new Dictionary<string, int>();
+
+        // Distribute the puff reduction linearly over the remaining days
+        for (int i = 0; i < daysUntilQuit; i++)
+        {
+            DateTime targetDate = today.AddDays(i);
+            string dateKey = targetDate.ToString("yyyy-MM-dd");
+
+            // Linearly reduce the puff count to zero
+            int dailyGoal = (int)Math.Ceiling(averageDailyPuffs * (1 - (double)i / daysUntilQuit));
+            dailyPuffGoals[dateKey] = dailyGoal;
+
+            Debug.WriteLine($"Date: {dateKey}, Puff Goal: {dailyGoal}");
+        }
+
+        // Save the calculated puff goals to Firebase
+        await Firebase.SaveDailyPuffGoalsAsync(userId, dailyPuffGoals);
+
+        Debug.WriteLine("Daily puff goals saved to Firebase.");
+    }
+
     public string FormattedTimeSinceLastPuff =>  
         TimeSinceLastPuff.TotalSeconds > 0  
             ? $"{TimeSinceLastPuff.Hours:D2}:{TimeSinceLastPuff.Minutes:D2}:{TimeSinceLastPuff.Seconds:D2}"  

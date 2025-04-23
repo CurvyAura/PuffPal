@@ -3,6 +3,7 @@ using Firebase.Database;
 using Firebase.Database.Query;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -169,6 +170,44 @@ namespace PuffPal.Services
             return weeklyPuffData;
         }
 
+        public async Task<DateTime?> GetQuitDateAsync(string userId)
+        {
+            try
+            {
+                // Retrieve the quit date from Firebase
+                var quitDateString = await _client
+                    .Child("users")
+                    .Child(userId)
+                    .Child("QuitDate")
+                    .OnceSingleAsync<string>();
+
+                if (!string.IsNullOrEmpty(quitDateString))
+                {
+                    // Parse the quit date string into a DateTime object
+                    return DateTime.Parse(quitDateString);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error retrieving quit date: {ex.Message}");
+            }
+
+            // Return null if no quit date is found or an error occurs
+            return null;
+        }
+
+        public async Task SaveDailyPuffGoalsAsync(string userId, Dictionary<string, int> dailyPuffGoals)
+        {
+            foreach (var goal in dailyPuffGoals)
+            {
+                await _client
+                    .Child("users")
+                    .Child(userId)
+                    .Child("puffGoals")
+                    .Child(goal.Key) // Date as the key
+                    .PutAsync(goal.Value); // Puff goal as the value
+            }
+        }
 
     }
 }
