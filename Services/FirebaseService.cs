@@ -11,6 +11,7 @@ namespace PuffPal.Services
     public class FirebaseService
     {
         private readonly FirebaseClient _client;
+
         public FirebaseService()
         {
             _client = new Firebase.Database.FirebaseClient("https://puffpal-fadb9-default-rtdb.firebaseio.com/");
@@ -22,6 +23,24 @@ namespace PuffPal.Services
                 .PostAsync(new { message = message, timestamp = DateTime.UtcNow });
         }
 
+        public async Task SaveUserProfileAsync(string userid, string name, DateTime quitDay)
+        {
+            //string userId = await GetCurrentUserIdAsync(); //Retrives userid from login
+
+            //if (string.IsNullOrEmpty(userId))
+            //{
+            //    throw new InvalidOperationException("User is not logged in.");
+            //}
+            await _client
+                .Child("users")
+                .Child("userid")
+                .Child("name").PutAsync(name);
+
+            await _client
+                .Child("users")
+                .Child("userid")
+                .Child("quitDay").PutAsync(quitDay);
+        }
 
         // Put database service funcs below (also finish the ones that arent done)
         public async Task SavePuffAsync(int userId, DateTime timestamp)
