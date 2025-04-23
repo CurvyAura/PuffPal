@@ -111,26 +111,35 @@ namespace PuffPal.Services
 
             return dailyPuffCounts;
         }
-    
 
         public async Task<DateTime?> GetLastPuffTimeAsync(string userId)
         {
-            // Retrieve the last puff time for the user
-            var lastPuffTime = await _client
+            // Retrieve the serialized last puff time for the user
+            var serializedTimestamp = await _client
                 .Child("lastPuffTime")
                 .Child(userId)
-                .OnceSingleAsync<DateTime?>();
+                .OnceSingleAsync<string>();
 
-            return lastPuffTime;
+            // Deserialize the timestamp back into a DateTime object
+            if (DateTime.TryParse(serializedTimestamp, null, System.Globalization.DateTimeStyles.RoundtripKind, out var lastPuffTime))
+            {
+                return lastPuffTime;
+            }
+
+            return null; // Return null if the timestamp is not valid
         }
+
 
         public async Task SaveLastPuffTimeAsync(string userId, DateTime timestamp)
         {
-            // Save the current timestamp as the last puff time for the user
+            // Serialize the DateTime to an ISO 8601 string format
+            string serializedTimestamp = timestamp.ToString("o"); // "o" is the round-trip format (ISO 8601)
+
+            // Save the serialized timestamp as the last puff time for the user
             await _client
                 .Child("lastPuffTime")
                 .Child(userId)
-                .PutAsync(timestamp);
+                .PutAsync(serializedTimestamp);
         }
 
     }
