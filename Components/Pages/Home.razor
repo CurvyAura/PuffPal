@@ -1,6 +1,7 @@
 ﻿@page "/home"
 @using PuffPal.Services
 @using System.Text.Json
+@using System.Diagnostics
 @inject FirebaseService Firebase  
 @attribute [Authorize] // Add this to any page that the user can see only after they login  
 
@@ -79,23 +80,21 @@
 
     public async void PuffAdd()
     {
-        // Replace with the actual user ID
-        string userId = "000001"; // Replace with the logged-in user's ID
+        await Task.Yield(); // Ensure the method runs asynchronously
 
-        // Record the time of the puff
+        string userId = "000001";
+
         LastPuffTime = DateTime.Now;
 
-        // Increment the puff count in the database
         await Firebase.SavePuffAsync(userId, LastPuffTime.Value);
 
-        // Fetch the updated puff count for today
         PuffsTaken = await Firebase.GetDailyPuffCountAsync(userId);
 
-        // Reset streak days and timer
         StreakDays = 0;
         TimeSinceLastPuff = TimeSpan.Zero;
 
-        // Update the UI
+        Debug.WriteLine($"Updated PuffsTaken: {PuffsTaken}");
+
         StateHasChanged();
     }
 
@@ -116,10 +115,16 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // Initialize the app state
+        string userId = "000001"; // Replace with the logged-in user's ID
+
+        // Get the puff count for today
+        PuffsTaken = await Firebase.GetDailyPuffCountAsync(userId);
+
+        Debug.WriteLine($"Initial PuffsTaken: {PuffsTaken}");
+
         await DailyPuffAvg();
-        await StreakChecker();        
-        StartPuffTimer(); // Start the timer
+        await StreakChecker();
+        StartPuffTimer();
     }
 
     public void StopPuffTimer()  

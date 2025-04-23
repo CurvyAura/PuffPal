@@ -75,12 +75,14 @@ namespace PuffPal.Services
 
         public async Task<int> GetDailyPuffCountAsync(string userId)
         {
-            string today = DateTime.UtcNow.ToString("yyyy-MM-dd");
+            //string today = DateTime.UtcNow.ToString("yyyy-MM-dd");
+            string today = DateTime.Now.ToString("yyyy-MM-dd");
+
 
             // Retrieve the puff count for today
             var puffData = await _client
                 .Child("dailyPuffs")
-                .Child(userId)
+                .Child(userId) 
                 .Child(today)
                 .OnceSingleAsync<int?>();
 
