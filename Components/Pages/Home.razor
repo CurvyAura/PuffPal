@@ -280,6 +280,18 @@
             DailyPuffList = new List<int>();
         }
 
+        // Get the quit date from the database
+        DateTime? quitDate = await Firebase.GetQuitDateAsync(userId);
+        if (quitDate.HasValue)
+        {
+            selectedQuitDate = quitDate.Value;
+            Debug.WriteLine($"Quit Date retrieved: {selectedQuitDate}");
+        }
+        else
+        {
+            Debug.WriteLine("No Quit Date found in the database.");
+        }
+
         await StreakChecker();
 
         // Calculate the weekly average
