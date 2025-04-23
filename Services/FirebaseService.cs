@@ -151,12 +151,24 @@ namespace PuffPal.Services
                     .Child(dateKey)
                     .OnceSingleAsync<int?>();
 
+                // If puffData is null, set it to zero
+                if (puffData == null)
+                {
+                    await _client
+                        .Child("users")
+                        .Child(userId)
+                        .Child("dailyPuffs")
+                        .Child(dateKey)
+                        .PutAsync(0);
+                }
+
                 // Add the puff count to the dictionary (default to 0 if no data exists)
                 weeklyPuffData[dateKey] = puffData ?? 0;
             }
 
             return weeklyPuffData;
         }
+
 
     }
 }

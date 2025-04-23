@@ -18,9 +18,9 @@
 
    <!-- Quick stats placeholders -->  
    <div class="stats">  
-       <div class="stat">  
-           <span>Weekly Avg: @PuffsAvg</span>  
-       </div>  
+       <div class="stat">
+            <span>Weekly Avg: @PuffsAvg</span>
+        </div>  
        <div class="stat">  
            <span>Streak: @StreakDays</span>  
        </div>  
@@ -64,6 +64,7 @@
     private System.Timers.Timer? PuffTimerInstance;  
     private bool showQuitDatePopup = false; // Controls the visibility of the popup
     private DateTime selectedQuitDate = DateTime.Today; // Stores the selected quit date
+	public List<int> DailyPuffList = new List<int>(); // Placeholder for daily puff data
 
     // Show the popup
     private void ShowQuitDatePopup()
@@ -163,8 +164,7 @@
         // Get the puff count for today
         PuffsTaken = await Firebase.GetDailyPuffCountAsync(userId);
 
-
-		//get the weekly puff data
+        // Get the weekly puff data
         var weeklyPuffData = await Firebase.GetWeeklyPuffDataAsync(userId);
 
         foreach (var entry in weeklyPuffData)
@@ -183,12 +183,25 @@
         {
             Debug.WriteLine("No Last Puff Time found.");
         }
+
         DailyPuffList = await Firebase.GetDailyPuffDataAsync(userId);
-        Debug.WriteLine($"Initial PuffsTaken: {PuffsTaken}");
+        if (DailyPuffList == null)
+        {
+            DailyPuffList = new List<int>();
+        }
 
         await StreakChecker();
+
+        // Calculate the weekly average
+        await CalculateWeeklyAverageAsync();
+
+        Debug.WriteLine($"Initial PuffsTaken: {PuffsTaken}");
+
         StartPuffTimer();
     }
+
+
+
 
     public void StopPuffTimer()  
     {  
@@ -198,11 +211,17 @@
 
     public async Task StreakChecker()
     {
+        if (DailyPuffList == null || DailyPuffList.Count == 0)
+        {
+            StreakDays = 0; // No data, no streak
+            return;
+        }
+
         // Calculate the streak
         int streak = 0;
         for (int i = DailyPuffList.Count - 1; i >= 0; i--) // Count backward through the list
         {
-            if (DailyPuffList[i] == 0)
+            if (DailyPuffList[i] == 0) // A day with no puffs
             {
                 streak++;
             }
@@ -211,10 +230,39 @@
                 break; // Stop counting if a day with non-zero puffs is encountered
             }
         }
+
         StreakDays = streak;
+        Debug.WriteLine($"Current Streak: {StreakDays} days");
     }
 
-    public List<int> DailyPuffList = new List<int>();
+    public async Task CalculateWeeklyAverageAsync()
+    {
+        // Retrieve the UID of the logged-in user
+        string? userId = AuthStateProvider.GetCurrentUserUid();
+
+        if (string.IsNullOrEmpty(userId))
+        {
+            Debug.WriteLine("User is not authenticated.");
+            return;
+        }
+
+        // Get the weekly puff data
+        var weeklyPuffData = await Firebase.GetWeeklyPuffDataAsync(userId);
+
+        if (weeklyPuffData == null || weeklyPuffData.Count == 0)
+        {
+            PuffsAvg = 0; // No data, set average to 0
+        }
+        else
+        {
+            // Calculate the average
+            PuffsAvg = Math.Round(weeklyPuffData.Values.Average(), 2);
+        }
+
+        Debug.WriteLine($"Weekly Average Puffs: {PuffsAvg}");
+
+        StateHasChanged(); // Update the UI
+    }
 
     public Home()
     {
