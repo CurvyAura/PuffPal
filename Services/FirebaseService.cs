@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace PuffPal.Services
@@ -33,15 +34,13 @@ namespace PuffPal.Services
             //{
             //    throw new InvalidOperationException("User is not logged in.");
             //}
+            string jsonquitdate = JsonSerializer.Serialize(quitDay.ToString("o"));
             await _client
                 .Child("users")
-                .Child("userid")
-                .Child("name").PutAsync(name);
-
-            await _client
-                .Child("users")
-                .Child("userid")
-                .Child("quitDay").PutAsync(quitDay);
+                .Child(userid)
+                .Child("QuitDate")
+                .PutAsync(jsonquitdate);
+                
         }
 
         // Save a puff event for the current day

@@ -36,7 +36,24 @@
        </NavLink>  
    </button>  
 </div>  
+<div>
+    <!-- Button to trigger the popup -->
+    <button class="btn btn-success" @onclick="ShowQuitDatePopup">Set Quit Date</button>
+</div>
 
+@if (showQuitDatePopup)
+{
+    <div class="modal-overlay">
+        <div class="modal-content">
+            <h3>Select Your Quit Date</h3>
+            <input type="date" @bind="selectedQuitDate" class="form-control" />
+            <div class="mt-2">
+                <button class="btn btn-success" @onclick="SaveQuitDate">Save</button>
+                <button class="btn btn-danger" @onclick="CloseQuitDatePopup">Cancel</button>
+            </div>
+        </div>
+    </div>
+}
 @code {
 
     public int PuffsTaken = 0; // Placeholder until database is implemented  
@@ -45,7 +62,43 @@
     public TimeSpan TimeSinceLastPuff = TimeSpan.Zero;  
     public DateTime? LastPuffTime = null;  // Placeholder until database is implemented  
     private System.Timers.Timer? PuffTimerInstance;  
+    private bool showQuitDatePopup = false; // Controls the visibility of the popup
+    private DateTime selectedQuitDate = DateTime.Today; // Stores the selected quit date
 
+    // Show the popup
+    private void ShowQuitDatePopup()
+    {
+        showQuitDatePopup = true;
+    }
+
+    // Close the popup
+    private void CloseQuitDatePopup()
+    {
+        showQuitDatePopup = false;
+    }
+
+    // Save the quit date
+    private async void SaveQuitDate()
+    {
+        // Retrieve the UID of the logged-in user
+        string? userId = AuthStateProvider.GetCurrentUserUid();
+
+        if (string.IsNullOrEmpty(userId))
+        {
+            Debug.WriteLine("User is not authenticated.");
+            return;
+        }
+
+        // Save the quit date to Firebase
+        await Firebase.SaveUserProfileAsync(userId, "QuitDate", selectedQuitDate);
+
+        Debug.WriteLine($"Quit date saved: {selectedQuitDate}");
+
+        // Close the popup
+        showQuitDatePopup = false;
+
+        StateHasChanged();
+    }
     public string FormattedTimeSinceLastPuff =>  
         TimeSinceLastPuff.TotalSeconds > 0  
             ? $"{TimeSinceLastPuff.Hours:D2}:{TimeSinceLastPuff.Minutes:D2}:{TimeSinceLastPuff.Seconds:D2}"  
