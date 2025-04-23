@@ -43,7 +43,7 @@
     public double PuffsAvg = 0;  
     public int StreakDays = 0;  
     public TimeSpan TimeSinceLastPuff = TimeSpan.Zero;  
-    private DateTime? LastPuffTime = null;  // Placeholder until database is implemented  
+    public DateTime? LastPuffTime = null;  // Placeholder until database is implemented  
     private System.Timers.Timer? PuffTimerInstance;  
 
     public string FormattedTimeSinceLastPuff =>  
@@ -92,6 +92,8 @@
 
         LastPuffTime = DateTime.Now;
 
+        await Firebase.SaveLastPuffTimeAsync(userId, LastPuffTime.Value);
+
         await Firebase.SavePuffAsync(userId, LastPuffTime.Value);
 
         PuffsTaken = await Firebase.GetDailyPuffCountAsync(userId);
@@ -135,6 +137,19 @@
 
         // Get the puff count for today
         PuffsTaken = await Firebase.GetDailyPuffCountAsync(userId);
+
+
+        // Get the last puff time
+        LastPuffTime = await Firebase.GetLastPuffTimeAsync(userId);
+
+        if (LastPuffTime.HasValue)
+        {
+            Debug.WriteLine($"Last Puff Time: {LastPuffTime.Value}");
+        }
+        else
+        {
+            Debug.WriteLine("No Last Puff Time found.");
+        }
 
         Debug.WriteLine($"Initial PuffsTaken: {PuffsTaken}");
 

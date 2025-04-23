@@ -112,5 +112,27 @@ namespace PuffPal.Services
 
             return dailyPuffCounts;
         }
+    
+
+        public async Task<DateTime?> GetLastPuffTimeAsync(string userId)
+        {
+            // Retrieve the last puff time for the user
+            var lastPuffTime = await _client
+                .Child("lastPuffTime")
+                .Child(userId)
+                .OnceSingleAsync<DateTime?>();
+
+            return lastPuffTime;
+        }
+
+        public async Task SaveLastPuffTimeAsync(string userId, DateTime timestamp)
+        {
+            // Save the current timestamp as the last puff time for the user
+            await _client
+                .Child("lastPuffTime")
+                .Child(userId)
+                .PutAsync(timestamp);
+        }
+
     }
 }
