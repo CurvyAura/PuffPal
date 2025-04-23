@@ -26,12 +26,7 @@ namespace PuffPal
             builder.Services.AddBlazorWebViewDeveloperTools();
             builder.Logging.AddDebug();
 #endif
-            // Register services
-            builder.Services.AddSingleton<UserService>();
-            builder.Services.AddSingleton<ProgressService>();
-            builder.Services.AddSingleton<AchievementService>();
-            builder.Services.AddSingleton<DailyLogService>();
-            builder.Services.AddSingleton<QuoteService>();
+            // Register service
             builder.Services.AddSingleton<FirebaseService>();
 
             builder.Services.AddScoped(sp => new FirebaseAuthClient(new FirebaseAuthConfig()
