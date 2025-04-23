@@ -182,9 +182,8 @@
             dailyPuffGoals[dateKey] = dailyGoal;
 
             Debug.WriteLine($"Date: {dateKey}, Puff Goal: {dailyGoal}");
-			DailyGoal = dailyGoal;
         }
-
+        DailyGoal = dailyPuffGoals[today.ToString("yyyy-MM-dd")]; // Set today's goal
         // Save the calculated puff goals to Firebase
         await Firebase.SaveDailyPuffGoalsAsync(userId, dailyPuffGoals);
 
@@ -286,6 +285,8 @@
 
         // Calculate the weekly average
         await CalculateWeeklyAverageAsync();
+
+		await SaveCalculatedPuffGoalsAsync();
 
         Debug.WriteLine($"Initial PuffsTaken: {PuffsTaken}");
 
