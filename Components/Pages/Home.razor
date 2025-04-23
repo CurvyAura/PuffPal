@@ -127,6 +127,7 @@
 
         StreakDays = 0;
         TimeSinceLastPuff = TimeSpan.Zero;
+        await CalculateWeeklyAverageAsync();
 
         Debug.WriteLine($"Updated PuffsTaken: {PuffsTaken}");
 
