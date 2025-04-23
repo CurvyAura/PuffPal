@@ -61,7 +61,8 @@ namespace PuffPal.Services
                .Child("dailyPuffs")
                .OnceSingleAsync<Dictionary<string, int>>();
 
-            int currentCount = puffData.ContainsKey(today) ? puffData[today] : 0;
+            int currentCount = puffData != null && puffData.ContainsKey(today) ? puffData[today] : 0;
+
 
             // Increment the puff count
             await _client
