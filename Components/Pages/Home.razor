@@ -61,21 +61,43 @@
     // copied func below, we will need to specify the user that took the puff.
     // }  
 
-    public async void PuffAdd()
-          {
-              // Record the time of the puff
-              LastPuffTime = DateTime.Now;
-              PuffsTaken++;
+    // public async void PuffAdd()
+    //       {
+    //           Record the time of the puff
+    //           LastPuffTime = DateTime.Now;
+    //           PuffsTaken++;
 
-              // Reset streak days and timer
-              StreakDays = 0;
-              TimeSinceLastPuff = TimeSpan.Zero;
-              string jsonname = JsonSerializer.Serialize("Bobby");
-              DateTime jsondate = DateTime.Now; // Use DateTime directly instead of serializing it
-              // Save the puff event to the database
-              await Firebase.SendTestPuffAsync($"Puff tapped at {DateTime.Now}"); // Replace 1 with the actual user ID
-              await Firebase.SaveUserProfileAsync("000001", jsonname, jsondate); // Pass DateTime directly
-          }
+    //           Reset streak days and timer
+    //           StreakDays = 0;
+    //           TimeSinceLastPuff = TimeSpan.Zero;
+    //           string jsonname = JsonSerializer.Serialize("Bobby");
+    //           DateTime jsondate = DateTime.Now; Use DateTime directly instead of serializing it
+    //           Save the puff event to the database
+    //           await Firebase.SendTestPuffAsync($"Puff tapped at {DateTime.Now}"); Replace 1 with the actual user ID
+    //           await Firebase.SaveUserProfileAsync("000001", jsonname, jsondate); Pass DateTime directly
+    //       }
+
+    public async void PuffAdd()
+    {
+        // Replace with the actual user ID
+        string userId = "000001"; // Replace with the logged-in user's ID
+
+        // Record the time of the puff
+        LastPuffTime = DateTime.Now;
+
+        // Increment the puff count in the database
+        await Firebase.SavePuffAsync(userId, LastPuffTime.Value);
+
+        // Fetch the updated puff count for today
+        PuffsTaken = await Firebase.GetDailyPuffCountAsync(userId);
+
+        // Reset streak days and timer
+        StreakDays = 0;
+        TimeSinceLastPuff = TimeSpan.Zero;
+
+        // Update the UI
+        StateHasChanged();
+    }
 
     public void StartPuffTimer()  
     {  

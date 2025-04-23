@@ -1,4 +1,5 @@
-﻿using Firebase.Database;
+﻿using Firebase.Auth;
+using Firebase.Database;
 using Firebase.Database.Query;
 using System;
 using System.Collections.Generic;
@@ -42,18 +43,71 @@ namespace PuffPal.Services
                 .Child("quitDay").PutAsync(quitDay);
         }
 
-        // Put database service funcs below (also finish the ones that arent done)
-        public async Task SavePuffAsync(int userId, DateTime timestamp)
+        // Save a puff event for the current day
+
+        //•	Purpose: Increment the puff count for the current day.
+        //•	Logic:
+        //•	Use the current date(yyyy-MM-dd) as the key for the puff count.
+        //•	Retrieve the current puff count for the day.
+        //•	Increment the count and save it back to the database.
+
+        public async Task SavePuffAsync(string userId, DateTime timestamp)
         {
-            // Logic to save puff data to the database
-            // Example: Save to Firebase or another database
+            string today = timestamp.ToString("yyyy-MM-dd");
+
+            // Get the current puff count for today
+            var puffData = await _client
+                .Child("dailyPuffs")
+                .Child(userId)
+                .Child(today)
+                .OnceSingleAsync<int?>();
+
+            int currentCount = puffData ?? 0;
+
+            // Increment the puff count
+            await _client
+                .Child("dailyPuffs")
+                .Child(userId)
+                .Child(today)
+                .PutAsync(currentCount + 1);
         }
+
+
+        public async Task<int> GetDailyPuffCountAsync(string userId)
+        {
+            string today = DateTime.UtcNow.ToString("yyyy-MM-dd");
+
+            // Retrieve the puff count for today
+            var puffData = await _client
+                .Child("dailyPuffs")
+                .Child(userId)
+                .Child(today)
+                .OnceSingleAsync<int?>();
+
+            return puffData ?? 0;
+        }
+
+
+        // Retrieve daily puff data for a user  
+
+        //•	Purpose: Retrieve all daily puff counts for a user.
+        //•	Logic:
+        //•	Fetch all puff data for the user from the dailyPuffs/{ userId} path.
+        //•	Convert the data into a list of daily puff counts.
 
         public async Task<List<int>> GetDailyPuffDataAsync(int userId)
         {
-            // Logic to fetch daily puff data from the database
-            // Example: Fetch from Firebase or another database
-            return new List<int> { 23, 12, 5, 26, 0 }; // Example data
+            var puffData = await _client
+                .Child("dailyPuffs")
+                .Child(userId.ToString())
+                .OnceAsync<KeyValuePair<string, int>>();
+
+            // Convert the data into a list of daily puff counts  
+            var dailyPuffCounts = puffData
+                .Select(static p => p.Object.Value)
+                .ToList();
+
+            return dailyPuffCounts;
         }
     }
 }
