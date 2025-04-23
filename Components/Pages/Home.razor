@@ -104,34 +104,6 @@
             ? $"{TimeSinceLastPuff.Hours:D2}:{TimeSinceLastPuff.Minutes:D2}:{TimeSinceLastPuff.Seconds:D2}"  
             : "00:00:00";  
 
-    // public async void PuffAdd()  
-    // {  
-    //     Record the time of the puff  
-    //     LastPuffTime = DateTime.Now;  
-    //     PuffsTaken++;  
-    //     StreakDays = 0; Reset streak days on puff  
-    //     TimeSinceLastPuff = TimeSpan.Zero; Reset the timer  
-    //     await Firebase.SendTestPuffAsync($"Puff tapped at {DateTime.Now}"); Zeus send this to the database, and my life is yours 
-
-    // copied func below, we will need to specify the user that took the puff.
-    // }  
-
-    // public async void PuffAdd()
-    //       {
-    //           Record the time of the puff
-    //           LastPuffTime = DateTime.Now;
-    //           PuffsTaken++;
-
-    //           Reset streak days and timer
-    //           StreakDays = 0;
-    //           TimeSinceLastPuff = TimeSpan.Zero;
-    //           string jsonname = JsonSerializer.Serialize("Bobby");
-    //           DateTime jsondate = DateTime.Now; Use DateTime directly instead of serializing it
-    //           Save the puff event to the database
-    //           await Firebase.SendTestPuffAsync($"Puff tapped at {DateTime.Now}"); Replace 1 with the actual user ID
-    //           await Firebase.SaveUserProfileAsync("000001", jsonname, jsondate); Pass DateTime directly
-    //       }
-
     public async void PuffAdd()
     {
         // Retrieve the UID of the logged-in user
@@ -177,7 +149,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        //string userId = "000001"; // Replace with the logged-in user's ID
         // Retrieve the UID of the logged-in user
         string? userId = AuthStateProvider.GetCurrentUserUid();
 
@@ -225,50 +196,8 @@
         PuffTimerInstance?.Dispose();  
     }  
 
-    // public void DailyPuffAvg()  
-    // {  
-    //     PuffListSetup(); Placeholder for database implementation  
-    //     int PuffSum = 0;  
-    //     foreach (int puff in DailyPuffList)  
-    //     {  
-    //         PuffSum += puff;  
-    //     }  
-    //     PuffsAvg = PuffSum / DailyPuffList.Count;  
-    // }  
-    // public async Task WeeklyPuffAvg()  
-    //    {
-    //        Calculate the average  
-    //     if (weeklyPuffData != null && weeklyPuffData.Count > 0)
-    //     {
-    //         PuffsAvg = weeklyPuffData.Values.Average();
-    //     }
-    //     else
-    //     {
-    //         PuffsAvg = 0;
-    //     }
-    // }
-
-    // public void StreakChecker()  
-    // {  
-    //     PuffListSetup(); Placeholder for database implementation  
-    //     int Streak = 0;  
-    //     for (int i = DailyPuffList.Count - 1; i >= 0; i--) Count backward through the list  
-    //     {  
-    //         if (DailyPuffList[i] == 0)  
-    //         {  
-    //             Streak++;  
-    //         }  
-    //         else  
-    //         {  
-    //             break; Stop counting if a day with non-zero puffs is encountered  
-    //         }  
-    //     }  
-    //     StreakDays = Streak;  
-    // }  
     public async Task StreakChecker()
     {
-        // Fetch daily puff data from the database
-
         // Calculate the streak
         int streak = 0;
         for (int i = DailyPuffList.Count - 1; i >= 0; i--) // Count backward through the list
@@ -290,15 +219,6 @@
     public Home()
     {
     }
-
-    // public void PuffListSetup() Placeholder for database implementation  
-    // {  
-    //     DailyPuffList.Add(23);  
-    //     DailyPuffList.Add(12);  
-    //     DailyPuffList.Add(5);  
-    //     DailyPuffList.Add(26);  
-    //     DailyPuffList.Add(0);  
-    // }  
 
     public void Dispose()  
     {  
