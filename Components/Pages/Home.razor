@@ -90,7 +90,7 @@
         }
 
         // Save the quit date to Firebase
-        await Firebase.SaveUserProfileAsync(userId, "QuitDate", selectedQuitDate);
+        await Firebase.SaveUserProfileAsync(userId, selectedQuitDate);
 
         Debug.WriteLine($"Quit date saved: {selectedQuitDate}");
 
@@ -211,10 +211,9 @@
         {
             Debug.WriteLine("No Last Puff Time found.");
         }
-
+        DailyPuffList = await Firebase.GetDailyPuffDataAsync(userId);
         Debug.WriteLine($"Initial PuffsTaken: {PuffsTaken}");
 
-        await DailyPuffAvg();
         await StreakChecker();
         StartPuffTimer();
     }
@@ -235,18 +234,18 @@
     //     }  
     //     PuffsAvg = PuffSum / DailyPuffList.Count;  
     // }  
-    public async Task WeeklyPuffAvg()  
-       {
-           // Calculate the average  
-        if (weeklyPuffData != null && weeklyPuffData.Count > 0)
-        {
-            PuffsAvg = weeklyPuffData.Values.Average();
-        }
-        else
-        {
-            PuffsAvg = 0;
-        }
-    }
+    // public async Task WeeklyPuffAvg()  
+    //    {
+    //        Calculate the average  
+    //     if (weeklyPuffData != null && weeklyPuffData.Count > 0)
+    //     {
+    //         PuffsAvg = weeklyPuffData.Values.Average();
+    //     }
+    //     else
+    //     {
+    //         PuffsAvg = 0;
+    //     }
+    // }
 
     // public void StreakChecker()  
     // {  
@@ -268,7 +267,6 @@
     public async Task StreakChecker()
     {
         // Fetch daily puff data from the database
-        DailyPuffList = await Firebase.GetDailyPuffDataAsync(userId: 1); // Replace 1 with the actual user ID
 
         // Calculate the streak
         int streak = 0;
