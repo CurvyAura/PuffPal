@@ -16,8 +16,8 @@
 
     <!-- Header Section -->
     <div class="text-center mb-4">
-        <h1 class="display-4 fw-bold text-light">PuffPal</h1>
-        <p class="lead text-muted">Break Free Today</p>
+        <img src="images/puffpal_logo.png" alt="PuffPal Logo" class="img-fluid" style="max-height: 100px;" />
+        <!--<p class="lead text-muted">Break Free Today</p>-->
     </div>
 
     <!-- Big Puff Button Section -->
@@ -69,6 +69,15 @@
             </div>
         </div>
     </div>
+
+       <!-- Motivational Quote Section -->
+   <div class="text-center mb-4">
+       <blockquote class="blockquote text-light">
+           <p class="mb-0">"@MotivationalQuote"</p>
+       </blockquote>
+   </div>
+
+
 
     <!-- Quit Date and Logout Buttons Section -->
     <div class="d-grid gap-3 mb-5">
@@ -130,6 +139,47 @@
 
     // Current daily puff goal
     public int DailyGoal = 0;
+
+    // Motivational quote of the day
+    public string MotivationalQuote { get; set; } = "Loading your daily motivation...";
+
+    // Fetches a random motivational quote
+    private async Task FetchMotivationalQuoteAsync()
+    {
+        // Hardcoded is fine for now, down the road it should go into DB.
+        var quotes = new List<string>
+        {
+            "The journey of a thousand miles begins with a single step.",
+            "Believe you can and you're halfway there.",
+            "Every day is a chance to get stronger and healthier.",
+            "You are stronger than your cravings.",
+            "Success is the sum of small efforts, repeated day in and day out.",
+            "Your future self will thank you for the choices you make today.",
+            "It always seems impossible until it’s done.",
+            "Don’t let yesterday take up too much of today.",
+            "The secret of getting ahead is getting started.",
+            "Small steps in the right direction can turn out to be the biggest step of your life.",
+            "You don’t have to be perfect, just consistent.",
+            "The pain you feel today will be the strength you feel tomorrow.",
+            "Quitting smoking is tough, but so are you.",
+            "Your health is your wealth—invest in it wisely.",
+            "One puff less today is one step closer to freedom.",
+            "You are not giving up something; you are gaining everything.",
+            "The best time to quit was yesterday. The second best time is now.",
+            "Your body deserves to be treated with respect and care.",
+            "Every craving you resist is a victory for your future self.",
+            "You are capable of amazing things—don’t let a habit define you."
+        };
+
+        // Simulate a delay (e.g., API call)
+        await Task.Delay(500);
+
+        // Pick a random quote
+        var random = new Random();
+        MotivationalQuote = quotes[random.Next(quotes.Count)];
+    }
+
+
 
     // Shows the quit date popup
     private void ShowQuitDatePopup()
@@ -281,6 +331,8 @@
 
         Debug.WriteLine($"Logged-in User UID: {userId}");
         await InitializeHomePageAsync();
+        await base.OnInitializedAsync();
+        await FetchMotivationalQuoteAsync();
     }
 
     // Loads and initializes data for the Home page
@@ -358,6 +410,8 @@
         StreakDays = streak;
         Debug.WriteLine($"Current Streak: {StreakDays} days");
     }
+
+
 
     // Calculates the weekly average of puffs
     public async Task CalculateWeeklyAverageAsync()
