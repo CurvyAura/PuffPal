@@ -21,7 +21,7 @@ namespace PuffPal.Services
         // Initializes the Firebase client with the database URL.
         public FirebaseService()
         {
-            _client = new Firebase.Database.FirebaseClient("");
+            _client = new Firebase.Database.FirebaseClient("https://puffpal-fadb9-default-rtdb.firebaseio.com/");
         }
 
         // Sends a test puff message to the Firebase database.
