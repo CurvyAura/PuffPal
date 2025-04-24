@@ -1,9 +1,14 @@
 ﻿@page "/home"
+
 @using PuffPal.Services
 @using System.Text.Json
 @using System.Diagnostics
-@inject FirebaseService Firebase  
+
+@inject FirebaseService Firebase 
 @inject CustomAuthStateProvider AuthStateProvider
+@inject IAccountManagement Acct
+@inject NavigationManager NavManager
+
 @attribute [Authorize]
 
 <div class="min-vh-100 bg-black text-light py-4 px-3">
@@ -65,24 +70,24 @@
 
 @if (showQuitDatePopup)
 {
-    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.75);">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content bg-dark text-light border border-secondary rounded shadow-lg">
-                <div class="modal-header border-bottom border-secondary">
-                    <h5 class="modal-title">📅 Set Your Quit Date</h5>
-                    <button type="button" class="btn-close btn-close-white" aria-label="Close" @onclick="CloseQuitDatePopup"></button>
-                </div>
-                <div class="modal-body">
-                    <label for="quitDate" class="form-label text-secondary">Choose a date you plan to quit</label>
-                    <input type="date" id="quitDate" @bind="selectedQuitDate" class="form-control bg-dark text-light border-secondary" />
-                </div>
-                <div class="modal-footer border-top border-secondary">
-                    <button class="btn btn-outline-secondary" @onclick="CloseQuitDatePopup">Cancel</button>
-                    <button class="btn btn-success" @onclick="SaveQuitDate">Save</button>
+        <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.75);">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-dark text-light border border-secondary rounded shadow-lg">
+                    <div class="modal-header border-bottom border-secondary">
+                        <h5 class="modal-title">📅 Set Your Quit Date</h5>
+                        <button type="button" class="btn-close btn-close-white" aria-label="Close" @onclick="CloseQuitDatePopup"></button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="quitDate" class="form-label text-secondary">Choose a date you plan to quit</label>
+                        <input type="date" id="quitDate" @bind="selectedQuitDate" class="form-control bg-dark text-light border-secondary" />
+                    </div>
+                    <div class="modal-footer border-top border-secondary">
+                        <button class="btn btn-outline-secondary" @onclick="CloseQuitDatePopup">Cancel</button>
+                        <button class="btn btn-success" @onclick="SaveQuitDate">Save</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 }
 
 @code {
@@ -92,10 +97,10 @@
     public int StreakDays = 0;  // Placeholder until database is called
     public TimeSpan TimeSinceLastPuff = TimeSpan.Zero;  // Placeholder until database is called
     public DateTime? LastPuffTime = null; // Placeholder until database is called
-    private System.Timers.Timer? PuffTimerInstance;  
+    private System.Timers.Timer? PuffTimerInstance;
     private bool showQuitDatePopup = false; // Controls the visibility of the popup
     private DateTime selectedQuitDate = DateTime.Today; // Placeholder until database is called
-	public List<int> DailyPuffList = new List<int>(); // Initailizing holder for daily puff data
+    public List<int> DailyPuffList = new List<int>(); // Initailizing holder for daily puff data
     public int DailyGoal = 0; // Placeholder until database is called
 
     // Show the popup
@@ -136,7 +141,7 @@
         StateHasChanged();
     }
 
-	// Calculate and save daily puff goals
+    // Calculate and save daily puff goals
     private async Task SaveCalculatedPuffGoalsAsync()
     {
         // Retrieve the UID of the logged-in user
@@ -183,16 +188,16 @@
             Debug.WriteLine($"Date: {dateKey}, Puff Goal: {dailyGoal}");
         }
         DailyGoal = dailyPuffGoals[today.ToString("yyyy-MM-dd")]; // Set today's goal
-        // Save the calculated puff goals to Firebase
+                                                                  // Save the calculated puff goals to Firebase
         await Firebase.SaveDailyPuffGoalsAsync(userId, dailyPuffGoals);
 
         Debug.WriteLine("Daily puff goals saved to Firebase.");
     }
 
-    public string FormattedTimeSinceLastPuff =>  
-        TimeSinceLastPuff.TotalSeconds > 0  
-            ? $"{TimeSinceLastPuff.Hours:D2}:{TimeSinceLastPuff.Minutes:D2}:{TimeSinceLastPuff.Seconds:D2}"  
-            : "00:00:00";  
+    public string FormattedTimeSinceLastPuff =>
+        TimeSinceLastPuff.TotalSeconds > 0
+            ? $"{TimeSinceLastPuff.Hours:D2}:{TimeSinceLastPuff.Minutes:D2}:{TimeSinceLastPuff.Seconds:D2}"
+            : "00:00:00";
 
     public async void PuffAdd()
     {
@@ -223,47 +228,61 @@
         StateHasChanged();
     }
 
-    public void StartPuffTimer()  
-    {  
+    public void StartPuffTimer()
+    {
         PuffTimerInstance = new System.Timers.Timer(1000); // 1-second interval  
-        PuffTimerInstance.Elapsed += (sender, e) =>  
-        {  
-            if (LastPuffTime.HasValue)  
-            {  
-                TimeSinceLastPuff = DateTime.Now - LastPuffTime.Value;  
+        PuffTimerInstance.Elapsed += (sender, e) =>
+        {
+            if (LastPuffTime.HasValue)
+            {
+                TimeSinceLastPuff = DateTime.Now - LastPuffTime.Value;
                 InvokeAsync(StateHasChanged); // Update the UI  
-            }  
-        };  
-        PuffTimerInstance.AutoReset = true;  
-        PuffTimerInstance.Start();  
-    }  
+            }
+        };
+        PuffTimerInstance.AutoReset = true;
+        PuffTimerInstance.Start();
+    }
 
     protected override async Task OnInitializedAsync()
     {
+        // Check if the user is authenticated
+        var isAuthenticated = await Acct.CheckAuthAsync();
+        Debug.WriteLine($"Home.razor: IsAuthenticated = {isAuthenticated}");
+
+        if (!isAuthenticated)
+        {
+            NavManager.NavigateTo("/login", true);
+            return;
+        }
+
         // Retrieve the UID of the logged-in user
         string? userId = AuthStateProvider.GetCurrentUserUid();
 
         if (string.IsNullOrEmpty(userId))
         {
-            Debug.WriteLine("User is not authenticated.");
+            Debug.WriteLine("Firebase client failed to load the user. Redirecting to login.");
+            NavManager.NavigateTo("/login", true);
             return;
         }
 
         Debug.WriteLine($"Logged-in User UID: {userId}");
 
-        // Get the puff count for today
-        PuffsTaken = await Firebase.GetDailyPuffCountAsync(userId);
+        // Proceed with the rest of the initialization logic
+        await InitializeHomePageAsync();
+    }
 
-        // Get the weekly puff data
-        var weeklyPuffData = await Firebase.GetWeeklyPuffDataAsync(userId);
+    private async Task InitializeHomePageAsync()
+    {
+        // Existing initialization logic
+        PuffsTaken = await Firebase.GetDailyPuffCountAsync(AuthStateProvider.GetCurrentUserUid());
+        var weeklyPuffData = await Firebase.GetWeeklyPuffDataAsync(AuthStateProvider.GetCurrentUserUid());
 
         foreach (var entry in weeklyPuffData)
         {
             Debug.WriteLine($"Date: {entry.Key}, Puff Count: {entry.Value}");
         }
 
-        // Get the last puff time
-        LastPuffTime = await Firebase.GetLastPuffTimeAsync(userId);
+        LastPuffTime = await Firebase.GetLastPuffTimeAsync(AuthStateProvider.GetCurrentUserUid());
 
         if (LastPuffTime.HasValue)
         {
@@ -274,14 +293,9 @@
             Debug.WriteLine("No Last Puff Time found.");
         }
 
-        DailyPuffList = await Firebase.GetDailyPuffDataAsync(userId);
-        if (DailyPuffList == null)
-        {
-            DailyPuffList = new List<int>();
-        }
+        DailyPuffList = await Firebase.GetDailyPuffDataAsync(AuthStateProvider.GetCurrentUserUid()) ?? new List<int>();
 
-        // Get the quit date from the database
-        DateTime? quitDate = await Firebase.GetQuitDateAsync(userId);
+        DateTime? quitDate = await Firebase.GetQuitDateAsync(AuthStateProvider.GetCurrentUserUid());
         if (quitDate.HasValue)
         {
             selectedQuitDate = quitDate.Value;
@@ -293,22 +307,19 @@
         }
 
         await StreakChecker();
-
-        // Calculate the weekly average
         await CalculateWeeklyAverageAsync();
-
-		await SaveCalculatedPuffGoalsAsync();
+        await SaveCalculatedPuffGoalsAsync();
 
         Debug.WriteLine($"Initial PuffsTaken: {PuffsTaken}");
 
         StartPuffTimer();
     }
 
-    public void StopPuffTimer()  
-    {  
-        PuffTimerInstance?.Stop();  
-        PuffTimerInstance?.Dispose();  
-    }  
+    public void StopPuffTimer()
+    {
+        PuffTimerInstance?.Stop();
+        PuffTimerInstance?.Dispose();
+    }
 
     public async Task StreakChecker()
     {
@@ -365,8 +376,8 @@
         StateHasChanged();
     }
 
-    public void Dispose()  
-    {  
-       StopPuffTimer(); // Ensure the timer is stopped
-   }  
+    public void Dispose()
+    {
+        StopPuffTimer(); // Ensure the timer is stopped
+    }  
 }

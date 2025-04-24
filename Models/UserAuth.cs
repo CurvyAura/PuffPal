@@ -8,7 +8,9 @@ namespace PuffPal.Models
 {
     public class UserAuth
     {
-        public Info Info { get; set; }
+        public Info Info { get; set; } = new Info();
+        public string Token { get; set; } = string.Empty; // Add this property
+
         public Credential Credential { get; set; }
     }
 

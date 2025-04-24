@@ -3,18 +3,33 @@
 @inject IAccountManagement Acct;
 @inject NavigationManager _navigation;
 
-<h3>Loading...</h3>
+@if (isLoading)
+{
+        <div class="text-center">
+            <h3>Loading...</h3>
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+}
 
 @code {
-	protected override async Task OnAfterRenderAsync(bool firstRender)
-	{
-		if (await Acct.CheckAuthAsync())
-		{
-			_navigation.NavigateTo("/home");
-		}
-		else
-		{
-			_navigation.NavigateTo("/login");
-		}
-	}
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var isAuthenticated = await Acct.CheckAuthAsync();
+        Console.WriteLine($"AppLaunch: IsAuthenticated = {isAuthenticated}");
+
+        if (isAuthenticated)
+        {
+            _navigation.NavigateTo("/home", true);
+        }
+        else
+        {
+            _navigation.NavigateTo("/login", true);
+        }
+
+        isLoading = false;
+    }
 }
