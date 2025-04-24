@@ -48,5 +48,4 @@ A mobile-first, dark-themed quit tracking app built using .NET MAUI Blazor and F
 1. **Clone the repo:**
 
 ```bash
-git clone https://github.com/your-username/puffpal.git
-cd puffpal
+git clone https://github.com/CurvyAura/PuffPal.git
