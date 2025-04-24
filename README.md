@@ -18,7 +18,6 @@ A mobile-first, dark-themed quit tracking app built using .NET MAUI Blazor and F
 - ⏱️ **Time Since Last Puff** live counter
 - 📅 **Quit Date Picker**
 - 🕶️ **Full Dark Mode UI** (Bootstrap styled)
-- 🔄 **Persistent Auth Session** with auto logout support
 - 🧮 **Puff Streak + Average Calculation**
 
 ---
