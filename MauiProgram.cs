@@ -31,8 +31,8 @@ namespace PuffPal
 
             builder.Services.AddScoped(sp => new FirebaseAuthClient(new FirebaseAuthConfig()
             {
-                ApiKey = "AIzaSyDg-ZPsfp2jMpYTgG4rZEL2aRjYSgUufNM",
-                AuthDomain = "puffpal-fadb9.firebaseapp.com",
+                ApiKey = "",
+                AuthDomain = "",
                 Providers = [new EmailProvider()]
             }));
 
