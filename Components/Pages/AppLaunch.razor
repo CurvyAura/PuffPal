@@ -1,35 +1,41 @@
 ﻿@page "/"
 
-@inject IAccountManagement Acct;
-@inject NavigationManager _navigation;
+@inject IAccountManagement Acct; // Injects the account management service for authentication checks
+@inject NavigationManager _navigation; // Injects the navigation manager for page redirection
 
+<!-- Displays a loading spinner while the authentication check is in progress -->
 @if (isLoading)
 {
-        <div class="text-center">
-            <h3>Loading...</h3>
-            <div class="spinner-border" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
+    <div class="text-center">
+        <h3>Loading...</h3>
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
         </div>
+    </div>
 }
 
 @code {
+    // Indicates whether the page is in a loading state
     private bool isLoading = true;
 
+    // Runs when the component is initialized
     protected override async Task OnInitializedAsync()
     {
+        // Check if the user is authenticated
         var isAuthenticated = await Acct.CheckAuthAsync();
         Console.WriteLine($"AppLaunch: IsAuthenticated = {isAuthenticated}");
 
+        // Navigate to the appropriate page based on the authentication state
         if (isAuthenticated)
         {
-            _navigation.NavigateTo("/home", true);
+            _navigation.NavigateTo("/home", true); // Redirect to the home page if authenticated
         }
         else
         {
-            _navigation.NavigateTo("/login", true);
+            _navigation.NavigateTo("/login", true); // Redirect to the login page if not authenticated
         }
 
+        // Set loading to false after navigation
         isLoading = false;
     }
 }

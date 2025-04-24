@@ -1,19 +1,27 @@
 ﻿@page "/logout"
 
-@inject IAccountManagement Acct;
-@inject NavigationManager NavManager;
+@inject IAccountManagement Acct; // Injects the account management service for logout functionality
+@inject NavigationManager NavManager; // Injects the navigation manager for page redirection
 
+<!-- Logout page header -->
 <h3>Logout</h3>
 
 @code {
-	private AuthorizeView? authView;
+    // Optional: AuthorizeView component (currently unused)
+    private AuthorizeView? authView;
 
-	protected async override Task OnInitializedAsync()
-	{
-		if (await Acct.CheckAuthAsync())
-		{
-			await Acct.LogoutAsync();
-			NavManager.NavigateTo("/login");
-		}
-	}
+    // Runs when the component is initialized
+    protected async override Task OnInitializedAsync()
+    {
+        // Check if the user is authenticated
+        if (await Acct.CheckAuthAsync())
+        {
+            // Log out the user
+            await Acct.LogoutAsync();
+
+            // Redirect to the login page after logout
+            NavManager.NavigateTo("/login");
+        }
+    }
 }
+

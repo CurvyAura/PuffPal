@@ -1,4 +1,7 @@
-﻿using Firebase.Auth;
+﻿// This class provides methods to interact with Firebase Realtime Database.
+// It includes functionality for saving and retrieving user data, puff data, and goals.
+
+using Firebase.Auth;
 using Firebase.Database;
 using Firebase.Database.Query;
 using System;
@@ -15,11 +18,13 @@ namespace PuffPal.Services
     {
         private readonly FirebaseClient _client;
 
+        // Initializes the Firebase client with the database URL.
         public FirebaseService()
         {
             _client = new Firebase.Database.FirebaseClient("https://puffpal-fadb9-default-rtdb.firebaseio.com/");
         }
 
+        // Sends a test puff message to the Firebase database.
         public async Task SendTestPuffAsync(string message)
         {
             await _client
@@ -27,7 +32,8 @@ namespace PuffPal.Services
                 .PostAsync(new { message = message, timestamp = DateTime.UtcNow });
         }
 
-        public async Task SaveUserProfileAsync(string userid, DateTime quitDay) 
+        // Saves the user's quit date to the Firebase database.
+        public async Task SaveUserProfileAsync(string userid, DateTime quitDay)
         {
             string jsonquitdate = JsonSerializer.Serialize(quitDay.ToString("o"));
             await _client
@@ -37,7 +43,8 @@ namespace PuffPal.Services
                 .PutAsync(jsonquitdate);
         }
 
-        public async Task SavePuffAsync(string userId, DateTime timestamp) 
+        // Saves a puff event for the user on a specific date.
+        public async Task SavePuffAsync(string userId, DateTime timestamp)
         {
             string today = timestamp.ToString("yyyy-MM-dd");
 
@@ -50,7 +57,6 @@ namespace PuffPal.Services
 
             int currentCount = puffData != null && puffData.ContainsKey(today) ? puffData[today] : 0;
 
-
             // Increment the puff count
             await _client
                 .Child("users")
@@ -60,6 +66,7 @@ namespace PuffPal.Services
                 .PutAsync(currentCount + 1);
         }
 
+        // Retrieves the puff count for the current day for a specific user.
         public async Task<int> GetDailyPuffCountAsync(string userId)
         {
             string today = DateTime.Now.ToString("yyyy-MM-dd");
@@ -74,6 +81,7 @@ namespace PuffPal.Services
             return puffData ?? 0;
         }
 
+        // Retrieves all daily puff data for a specific user.
         public async Task<List<int>> GetDailyPuffDataAsync(string userId)
         {
             var puffDict = await _client
@@ -88,6 +96,7 @@ namespace PuffPal.Services
             return puffDict.Values.ToList();
         }
 
+        // Retrieves the timestamp of the user's last puff event.
         public async Task<DateTime?> GetLastPuffTimeAsync(string userId)
         {
             var lastPuffTime = await _client
@@ -99,6 +108,7 @@ namespace PuffPal.Services
             return lastPuffTime;
         }
 
+        // Saves the timestamp of the user's last puff event.
         public async Task SaveLastPuffTimeAsync(string userId, DateTime timestamp)
         {
             await _client
@@ -108,18 +118,15 @@ namespace PuffPal.Services
                 .PutAsync(timestamp);
         }
 
+        // Retrieves puff data for the past 7 days for a specific user.
         public async Task<Dictionary<string, int>> GetWeeklyPuffDataAsync(string userId)
         {
-            // Get the current date
             DateTime today = DateTime.Now;
-
-            // Create a dictionary to store puff data for the past 7 days
             Dictionary<string, int> weeklyPuffData = new Dictionary<string, int>();
 
             // Loop through the past 7 days
             for (int i = 0; i < 7; i++)
             {
-                // Calculate the date for each day
                 DateTime date = today.AddDays(-i);
                 string dateKey = date.ToString("yyyy-MM-dd");
 
@@ -149,11 +156,11 @@ namespace PuffPal.Services
             return weeklyPuffData;
         }
 
+        // Retrieves the user's quit date from the Firebase database.
         public async Task<DateTime?> GetQuitDateAsync(string userId)
         {
             try
             {
-                // Retrieve the quit date from Firebase
                 var quitDateString = await _client
                     .Child("users")
                     .Child(userId)
@@ -162,7 +169,6 @@ namespace PuffPal.Services
 
                 if (!string.IsNullOrEmpty(quitDateString))
                 {
-                    // Parse the quit date string into a DateTime object
                     return DateTime.Parse(quitDateString);
                 }
             }
@@ -171,10 +177,10 @@ namespace PuffPal.Services
                 Debug.WriteLine($"Error retrieving quit date: {ex.Message}");
             }
 
-            // Return null if no quit date is found or an error occurs
             return null;
         }
 
+        // Saves the user's daily puff goals to the Firebase database.
         public async Task SaveDailyPuffGoalsAsync(string userId, Dictionary<string, int> dailyPuffGoals)
         {
             foreach (var goal in dailyPuffGoals)
@@ -187,6 +193,5 @@ namespace PuffPal.Services
                     .PutAsync(goal.Value); // Puff goal as the value
             }
         }
-
     }
 }

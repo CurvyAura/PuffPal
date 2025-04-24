@@ -1,67 +1,84 @@
 ﻿@page "/login"
 
-@inject IAccountManagement Acct;
-@inject NavigationManager NavManager;
+@inject IAccountManagement Acct; // Injects the account management service for login functionality
+@inject NavigationManager NavManager; // Injects the navigation manager for page redirection
 
+<!-- Display error messages if login fails -->
 @if (errorList.Length > 0)
 {
     foreach (var error in errorList)
     {
-        <div class="alert alert-danger">@error</div>
+                <div class="alert alert-danger">@error</div>
     }
 }
 
-@* <div class="d-flex justify-content-center align-items-center flex-column"> *@
+<!-- Login form container -->
 <div class="px-4">
-<h3>Login</h3>
-<EditForm Model="@_SignInModel" OnValidSubmit="DoLoginAsync">
-    <DataAnnotationsValidator/>
+    <h3>Login</h3>
+    <EditForm Model="@_SignInModel" OnValidSubmit="DoLoginAsync">
+        <DataAnnotationsValidator />
 
-    <div class="form-group">
-        <label>Email address</label>
-        <input type="email" class="form-control" @bind-value="@_SignInModel.Email" placeholder="" />
-        <ValidationMessage For="@(() => _SignInModel.Email)" />
-    </div>
+        <!-- Email input field -->
+        <div class="form-group">
+            <label>Email address</label>
+            <input type="email" class="form-control" @bind-value="@_SignInModel.Email" placeholder="" />
+            <ValidationMessage For="@(() => _SignInModel.Email)" />
+        </div>
 
-    <div class="form-group">
-        <label>Password</label>
-        <input type="password" class="form-control" @bind-value="@_SignInModel.Password" placeholder="" />
-        <ValidationMessage For="@(() => _SignInModel.Password)" />
-    </div>
+        <!-- Password input field -->
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" class="form-control" @bind-value="@_SignInModel.Password" placeholder="" />
+            <ValidationMessage For="@(() => _SignInModel.Password)" />
+        </div>
 
-    <div class="mt-2 text-end">
-        <NavLink class="nav-link" href="/register">
-            <span>Create an account?</span>
-        </NavLink>
-    </div>
+        <!-- Link to the registration page -->
+        <div class="mt-2 text-end">
+            <NavLink class="nav-link" href="/register">
+                <span>Create an account?</span>
+            </NavLink>
+        </div>
 
-    <div class="text-center mt-2">
-        <button class="btn btn-primary" type="submit">
-            <span class="@_spinnerClass" role="status" aria-hidden="true"></span>
-            Login
-        </button>
-    </div>
-</EditForm>
+        <!-- Submit button with spinner -->
+        <div class="text-center mt-2">
+            <button class="btn btn-primary" type="submit">
+                <span class="@_spinnerClass" role="status" aria-hidden="true"></span>
+                Login
+            </button>
+        </div>
+    </EditForm>
 </div>
-    @* </div> *@
 
 @code {
+    // CSS class for showing a spinner during the login process
     private string _spinnerClass = "";
+
+    // Model for capturing user login data
     private SignIn _SignInModel = new();
+
+    // List of error messages returned from the login process
     private string[] errorList = [];
 
+    // Handles the login process when the form is submitted
     public async Task DoLoginAsync()
     {
+        // Show the spinner while processing the login
         _spinnerClass = "spinner-border spinner-border-sm";
+
+        // Call the account management service to log in the user
         var result = await Acct.LoginAsync(_SignInModel.Email, _SignInModel.Password);
+
         if (result.Succeeded)
         {
+            // Redirect to the home page if login is successful
             NavManager.NavigateTo("/");
         }
         else
         {
+            // Hide the spinner and display error messages if login fails
             _spinnerClass = "";
             errorList = result.ErrorList;
         }
     }
 }
+

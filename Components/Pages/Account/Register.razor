@@ -1,68 +1,85 @@
 ﻿@page "/register"
 
-@inject IAccountManagement Acct;
-@inject NavigationManager NavManager;
+@inject IAccountManagement Acct; // Injects the account management service for user registration
+@inject NavigationManager NavManager; // Injects the navigation manager for page redirection
 
-@* <div class="d-flex justify-content-center align-items-center flex-column"> *@
+<!-- Registration form container -->
 <div class="px-4">
-<h3>Register</h3>
-<EditForm Model="@registrationModel" OnValidSubmit="SignUp">
-    <DataAnnotationsValidator/>
-    @* <div class="mb-2"> *@
-    @*     <img src="@_userAvatar" class="rounded-circle" height="50" width="50" alt="Alternate Text" /> *@
-    @* </div> *@
-    <div class="form-group">
-        <label>Username</label>
-        <input class="form-control" @bind-value="@registrationModel.UserName" placeholder="" />
-        <ValidationMessage For="@(() => registrationModel.UserName)" />
-    </div>
+    <h3>Register</h3>
+    <EditForm Model="@registrationModel" OnValidSubmit="SignUp">
+        <DataAnnotationsValidator />
 
-    <div class="form-group">
-        <label>Email address</label>
-        <input type="email" class="form-control" @bind-value="@registrationModel.Email" placeholder="" />
-        <ValidationMessage For="@(() => registrationModel.Email)" />
-    </div>
+        <!-- Username input field -->
+        <div class="form-group">
+            <label>Username</label>
+            <input class="form-control" @bind-value="@registrationModel.UserName" placeholder="" />
+            <ValidationMessage For="@(() => registrationModel.UserName)" />
+        </div>
 
-    <div class="form-group">
-        <label>Password</label>
-        <input type="password" class="form-control" @bind-value="@registrationModel.Password" placeholder="" />
-        <ValidationMessage For="@(() => registrationModel.Password)" />
-    </div>
+        <!-- Email input field -->
+        <div class="form-group">
+            <label>Email address</label>
+            <input type="email" class="form-control" @bind-value="@registrationModel.Email" placeholder="" />
+            <ValidationMessage For="@(() => registrationModel.Email)" />
+        </div>
 
-    <div class="mt-2 text-end">
-        <NavLink class="nav-link" href="/login">
-            <span>Already have an account?</span>
-        </NavLink>
-    </div>
+        <!-- Password input field -->
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" class="form-control" @bind-value="@registrationModel.Password" placeholder="" />
+            <ValidationMessage For="@(() => registrationModel.Password)" />
+        </div>
 
-    <div class="text-center mt-2">
-        <button class="btn btn-primary" type="submit">
-            <span class="@_spinnerClass" role="status" aria-hidden="true"></span>
-            Register
-        </button>
-    </div>
-</EditForm>
+        <!-- Link to the login page -->
+        <div class="mt-2 text-end">
+            <NavLink class="nav-link" href="/login">
+                <span>Already have an account?</span>
+            </NavLink>
+        </div>
+
+        <!-- Submit button with spinner -->
+        <div class="text-center mt-2">
+            <button class="btn btn-primary" type="submit">
+                <span class="@_spinnerClass" role="status" aria-hidden="true"></span>
+                Register
+            </button>
+        </div>
+    </EditForm>
 </div>
-@* </div> *@
 
 @code {
+    // Model for capturing user registration data
     SignUp registrationModel = new();
+
+    // List of error messages returned from the registration process
     private string[] errorList = [];
+
+    // CSS class for showing a spinner during the registration process
     private string _spinnerClass = "";
+
+    // Placeholder for a user avatar (currently unused)
     private string _userAvatar = "content/PuffPal.Shared/favicon.png";
 
+    // Handles the registration process when the form is submitted
     private async void SignUp()
     {
+        // Show the spinner while processing the registration
         _spinnerClass = "spinner-border spinner-border-sm";
+
+        // Call the account management service to register the user
         var result = await Acct.RegisterAsync(registrationModel.Email, registrationModel.UserName, registrationModel.Password);
+
         if (result.Succeeded)
         {
+            // Redirect to the login page if registration is successful
             NavManager.NavigateTo("/login");
         }
         else
         {
+            // Hide the spinner and display error messages if registration fails
             _spinnerClass = "";
             errorList = result.ErrorList;
         }
     }
 }
+

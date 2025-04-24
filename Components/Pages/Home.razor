@@ -11,22 +11,25 @@
 
 @attribute [Authorize]
 
+<!-- Main container for the Home page -->
 <div class="min-vh-100 bg-black text-light py-4 px-3">
 
+    <!-- Header Section -->
     <div class="text-center mb-4">
         <h1 class="display-4 fw-bold text-light">PuffPal</h1>
         <p class="lead text-muted">Break Free Today</p>
     </div>
 
-    <!-- Big Puff Button -->
+    <!-- Big Puff Button Section -->
     <div class="text-center mb-4">
         <button class="btn btn-danger btn-lg w-100 py-4 fs-3 fw-bold shadow" @onclick="PuffAdd">
             🚬 Tap to Add a Puff: <span class="fw-bolder">@PuffsTaken</span>
         </button>
     </div>
 
-    <!-- Stat Cards Row -->
+    <!-- Statistics Section -->
     <div class="row g-3 justify-content-center mb-4">
+        <!-- Current Daily Goal Card -->
         <div class="col-12 col-md-6">
             <div class="card bg-dark border-secondary text-center">
                 <div class="card-body p-3">
@@ -35,6 +38,8 @@
                 </div>
             </div>
         </div>
+
+        <!-- Weekly Average Card -->
         <div class="col-6 col-md-3">
             <div class="card bg-dark border-secondary text-center">
                 <div class="card-body p-3">
@@ -43,6 +48,8 @@
                 </div>
             </div>
         </div>
+
+        <!-- Streak Card -->
         <div class="col-6 col-md-3">
             <div class="card bg-dark border-secondary text-center">
                 <div class="card-body p-3">
@@ -51,6 +58,8 @@
                 </div>
             </div>
         </div>
+
+        <!-- Time Since Last Puff Card -->
         <div class="col-12 col-md-6">
             <div class="card bg-dark border-secondary text-center">
                 <div class="card-body p-3">
@@ -61,64 +70,82 @@
         </div>
     </div>
 
-    <!-- Quit Date and Logout Buttons -->
+    <!-- Quit Date and Logout Buttons Section -->
     <div class="d-grid gap-3 mb-5">
         <button class="btn btn-outline-light" @onclick="ShowQuitDatePopup">📅 Set Quit Date</button>
         <NavLink href="/logout" class="btn btn-outline-danger">Logout</NavLink>
     </div>
 </div>
 
+<!-- Quit Date Popup -->
 @if (showQuitDatePopup)
 {
-        <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.75);">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content bg-dark text-light border border-secondary rounded shadow-lg">
-                    <div class="modal-header border-bottom border-secondary">
-                        <h5 class="modal-title">📅 Set Your Quit Date</h5>
-                        <button type="button" class="btn-close btn-close-white" aria-label="Close" @onclick="CloseQuitDatePopup"></button>
-                    </div>
-                    <div class="modal-body">
-                        <label for="quitDate" class="form-label text-secondary">Choose a date you plan to quit</label>
-                        <input type="date" id="quitDate" @bind="selectedQuitDate" class="form-control bg-dark text-light border-secondary" />
-                    </div>
-                    <div class="modal-footer border-top border-secondary">
-                        <button class="btn btn-outline-secondary" @onclick="CloseQuitDatePopup">Cancel</button>
-                        <button class="btn btn-success" @onclick="SaveQuitDate">Save</button>
-                    </div>
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.75);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-light border border-secondary rounded shadow-lg">
+                <div class="modal-header border-bottom border-secondary">
+                    <h5 class="modal-title">📅 Set Your Quit Date</h5>
+                    <button type="button" class="btn-close btn-close-white" aria-label="Close" @onclick="CloseQuitDatePopup"></button>
+                </div>
+                <div class="modal-body">
+                    <label for="quitDate" class="form-label text-secondary">Choose a date you plan to quit</label>
+                    <input type="date" id="quitDate" @bind="selectedQuitDate" class="form-control bg-dark text-light border-secondary" />
+                </div>
+                <div class="modal-footer border-top border-secondary">
+                    <button class="btn btn-outline-secondary" @onclick="CloseQuitDatePopup">Cancel</button>
+                    <button class="btn btn-success" @onclick="SaveQuitDate">Save</button>
                 </div>
             </div>
         </div>
+    </div>
 }
 
 @code {
+    // Tracks the number of puffs taken today
+    public int PuffsTaken = 0;
 
-    public int PuffsTaken = 0; // Placeholder until database is called  
-    public double PuffsAvg = 0;  // Placeholder until database is called
-    public int StreakDays = 0;  // Placeholder until database is called
-    public TimeSpan TimeSinceLastPuff = TimeSpan.Zero;  // Placeholder until database is called
-    public DateTime? LastPuffTime = null; // Placeholder until database is called
+    // Weekly average of puffs
+    public double PuffsAvg = 0;
+
+    // Number of consecutive days without a puff
+    public int StreakDays = 0;
+
+    // Time elapsed since the last puff
+    public TimeSpan TimeSinceLastPuff = TimeSpan.Zero;
+
+    // Timestamp of the last puff
+    public DateTime? LastPuffTime = null;
+
+    // Timer instance for updating the time since the last puff
     private System.Timers.Timer? PuffTimerInstance;
-    private bool showQuitDatePopup = false; // Controls the visibility of the popup
-    private DateTime selectedQuitDate = DateTime.Today; // Placeholder until database is called
-    public List<int> DailyPuffList = new List<int>(); // Initailizing holder for daily puff data
-    public int DailyGoal = 0; // Placeholder until database is called
 
-    // Show the popup
+    // Controls the visibility of the quit date popup
+    private bool showQuitDatePopup = false;
+
+    // Selected quit date
+    private DateTime selectedQuitDate = DateTime.Today;
+
+    // List of daily puff counts
+    public List<int> DailyPuffList = new List<int>();
+
+    // Current daily puff goal
+    public int DailyGoal = 0;
+
+    // Shows the quit date popup
     private void ShowQuitDatePopup()
     {
         showQuitDatePopup = true;
     }
 
-    // Close the popup
+    // Closes the quit date popup
     private void CloseQuitDatePopup()
     {
         showQuitDatePopup = false;
     }
 
-    // Save the quit date
+    // Saves the quit date to Firebase and updates puff goals
     private async void SaveQuitDate()
     {
-        // Retrieve the UID of the logged-in user
         string? userId = AuthStateProvider.GetCurrentUserUid();
 
         if (string.IsNullOrEmpty(userId))
@@ -127,24 +154,17 @@
             return;
         }
 
-        // Save the quit date to Firebase
         await Firebase.SaveUserProfileAsync(userId, selectedQuitDate);
-
         Debug.WriteLine($"Quit date saved: {selectedQuitDate}");
 
-        // Recalculate and save daily puff goals
         await SaveCalculatedPuffGoalsAsync();
-
-        // Close the popup
         showQuitDatePopup = false;
-
         StateHasChanged();
     }
 
-    // Calculate and save daily puff goals
+    // Calculates and saves daily puff goals based on the quit date
     private async Task SaveCalculatedPuffGoalsAsync()
     {
-        // Retrieve the UID of the logged-in user
         string? userId = AuthStateProvider.GetCurrentUserUid();
 
         if (string.IsNullOrEmpty(userId))
@@ -153,7 +173,6 @@
             return;
         }
 
-        // Retrieve the quit date
         DateTime? quitDate = await Firebase.GetQuitDateAsync(userId);
 
         if (!quitDate.HasValue)
@@ -162,7 +181,6 @@
             return;
         }
 
-        // Calculate the number of days remaining until the quit date
         DateTime today = DateTime.UtcNow.Date;
         int daysUntilQuit = (quitDate.Value.Date - today).Days;
 
@@ -172,36 +190,34 @@
             return;
         }
 
-        double averageDailyPuffs = PuffsAvg; // Use the calculated weekly average
+        double averageDailyPuffs = PuffsAvg;
         Dictionary<string, int> dailyPuffGoals = new Dictionary<string, int>();
 
-        // Distribute the puff reduction linearly over the remaining days
         for (int i = 0; i < daysUntilQuit; i++)
         {
             DateTime targetDate = today.AddDays(i);
             string dateKey = targetDate.ToString("yyyy-MM-dd");
 
-            // Linearly reduce the puff count to zero
             int dailyGoal = (int)Math.Ceiling(averageDailyPuffs * (1 - (double)i / daysUntilQuit));
             dailyPuffGoals[dateKey] = dailyGoal;
 
             Debug.WriteLine($"Date: {dateKey}, Puff Goal: {dailyGoal}");
         }
-        DailyGoal = dailyPuffGoals[today.ToString("yyyy-MM-dd")]; // Set today's goal
-                                                                  // Save the calculated puff goals to Firebase
-        await Firebase.SaveDailyPuffGoalsAsync(userId, dailyPuffGoals);
 
+        DailyGoal = dailyPuffGoals[today.ToString("yyyy-MM-dd")];
+        await Firebase.SaveDailyPuffGoalsAsync(userId, dailyPuffGoals);
         Debug.WriteLine("Daily puff goals saved to Firebase.");
     }
 
+    // Formats the time since the last puff for display
     public string FormattedTimeSinceLastPuff =>
         TimeSinceLastPuff.TotalSeconds > 0
             ? $"{TimeSinceLastPuff.Hours:D2}:{TimeSinceLastPuff.Minutes:D2}:{TimeSinceLastPuff.Seconds:D2}"
             : "00:00:00";
 
+    // Handles the "Add Puff" button click
     public async void PuffAdd()
     {
-        // Retrieve the UID of the logged-in user
         string? userId = AuthStateProvider.GetCurrentUserUid();
 
         if (string.IsNullOrEmpty(userId))
@@ -213,7 +229,6 @@
         LastPuffTime = DateTime.Now;
 
         await Firebase.SaveLastPuffTimeAsync(userId, LastPuffTime.Value);
-
         await Firebase.SavePuffAsync(userId, LastPuffTime.Value);
 
         PuffsTaken = await Firebase.GetDailyPuffCountAsync(userId);
@@ -224,28 +239,28 @@
         await CalculateWeeklyAverageAsync();
 
         Debug.WriteLine($"Updated PuffsTaken: {PuffsTaken}");
-
         StateHasChanged();
     }
 
+    // Starts the timer to update the time since the last puff
     public void StartPuffTimer()
     {
-        PuffTimerInstance = new System.Timers.Timer(1000); // 1-second interval  
+        PuffTimerInstance = new System.Timers.Timer(1000);
         PuffTimerInstance.Elapsed += (sender, e) =>
         {
             if (LastPuffTime.HasValue)
             {
                 TimeSinceLastPuff = DateTime.Now - LastPuffTime.Value;
-                InvokeAsync(StateHasChanged); // Update the UI  
+                InvokeAsync(StateHasChanged);
             }
         };
         PuffTimerInstance.AutoReset = true;
         PuffTimerInstance.Start();
     }
 
+    // Initializes the Home page
     protected override async Task OnInitializedAsync()
     {
-        // Check if the user is authenticated
         var isAuthenticated = await Acct.CheckAuthAsync();
         Debug.WriteLine($"Home.razor: IsAuthenticated = {isAuthenticated}");
 
@@ -255,7 +270,6 @@
             return;
         }
 
-        // Retrieve the UID of the logged-in user
         string? userId = AuthStateProvider.GetCurrentUserUid();
 
         if (string.IsNullOrEmpty(userId))
@@ -266,14 +280,12 @@
         }
 
         Debug.WriteLine($"Logged-in User UID: {userId}");
-
-        // Proceed with the rest of the initialization logic
         await InitializeHomePageAsync();
     }
 
+    // Loads and initializes data for the Home page
     private async Task InitializeHomePageAsync()
     {
-        // Existing initialization logic
         PuffsTaken = await Firebase.GetDailyPuffCountAsync(AuthStateProvider.GetCurrentUserUid());
         var weeklyPuffData = await Firebase.GetWeeklyPuffDataAsync(AuthStateProvider.GetCurrentUserUid());
 
@@ -311,35 +323,35 @@
         await SaveCalculatedPuffGoalsAsync();
 
         Debug.WriteLine($"Initial PuffsTaken: {PuffsTaken}");
-
         StartPuffTimer();
     }
 
+    // Stops the puff timer
     public void StopPuffTimer()
     {
         PuffTimerInstance?.Stop();
         PuffTimerInstance?.Dispose();
     }
 
+    // Calculates the user's streak of days without a puff
     public async Task StreakChecker()
     {
         if (DailyPuffList == null || DailyPuffList.Count == 0)
         {
-            StreakDays = 0; // No data, no streak
+            StreakDays = 0;
             return;
         }
 
-        // Calculate the streak
         int streak = 0;
-        for (int i = DailyPuffList.Count - 1; i >= 0; i--) // Count backward through the list
+        for (int i = DailyPuffList.Count - 1; i >= 0; i--)
         {
-            if (DailyPuffList[i] == 0) // A day with no puffs
+            if (DailyPuffList[i] == 0)
             {
                 streak++;
             }
             else
             {
-                break; // Stop counting if a day with non-zero puffs is encountered
+                break;
             }
         }
 
@@ -347,9 +359,9 @@
         Debug.WriteLine($"Current Streak: {StreakDays} days");
     }
 
+    // Calculates the weekly average of puffs
     public async Task CalculateWeeklyAverageAsync()
     {
-        // Retrieve the UID of the logged-in user
         string? userId = AuthStateProvider.GetCurrentUserUid();
 
         if (string.IsNullOrEmpty(userId))
@@ -358,26 +370,24 @@
             return;
         }
 
-        // Get the weekly puff data
         var weeklyPuffData = await Firebase.GetWeeklyPuffDataAsync(userId);
 
         if (weeklyPuffData == null || weeklyPuffData.Count == 0)
         {
-            PuffsAvg = 0; // No data, set average to 0
+            PuffsAvg = 0;
         }
         else
         {
-            // Calculate the average
             PuffsAvg = Math.Round(weeklyPuffData.Values.Average(), 2);
         }
 
         Debug.WriteLine($"Weekly Average Puffs: {PuffsAvg}");
-
         StateHasChanged();
     }
 
+    // Disposes of the puff timer when the component is destroyed
     public void Dispose()
     {
-        StopPuffTimer(); // Ensure the timer is stopped
-    }  
+        StopPuffTimer();
+    }
 }
